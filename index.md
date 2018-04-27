@@ -1,13 +1,11 @@
 ---
 layout: default
 ---
+### Briefly:
+CSVA is a robust and fast algorithm for outlier elimination of keypoint matches. It can be used by developers and researches in different practical tasks with minor adaptation. 
 
 
 # CSVA
-
-### Briefly:
-CSVA is an algorithm for outlier elimination that can be used by developers and researches in different practical tasks with minor adaptation. It was applied for matching aerospace images and images of 3D-scenes. It is much more robust and accurate than standart epipolar geometry constraint, or fitting a plane with RANSAC.
-
 
 "Core" structural verification algorithm (CSVA) is outlier elimination algorithm that can be used by developers and researches in different practical tasks with minor adaptation.It is proposed the sever conditions for a variety of applications and feature extraction methods. The main idea is to cluster features whose parameters agree in similarity transform space. You can think about the algorithm as (and in fact it is) the improved and generalized version of Hough Clustering described in SIFT paper by D.Lowe. 
 
@@ -21,9 +19,6 @@ CSVA referes to the IV stage of the next figure
 
 ![Feature based methods](https://raw.githubusercontent.com/malashinroman/CSVA/gh-pages/_site/assets/matching_keypoints.jpg)
 
-https://raw.githubusercontent.com/malashinroman/CSVA/gh-pages/assets/pipeline.png
-
-%![Branching](https://guides.github.com/activities/hello-world/branching.png)
 
 ## Algorithm pipeline
 
@@ -32,17 +27,28 @@ The proposed algorithm pipeline involves:
 2. The improved Hough Clustering of keypoint matches
 3. Cluster verification procedure based on modified RANSAC. 
 
-![Feature based methods]({{ "/assets/pipeline.png" }})
+![Pipeline](https://raw.githubusercontent.com/malashinroman/CSVA/gh-pages/assets/pipeline.png) <!-- .element height="20%" width="20%" -->
 
-It is also shown that the usage of the nearest neighbour ratio may eliminate too many inliers when matching two images (especially in extreme conditions), and the preferable method is a simple many-to-one matches exclusion. The theory and experiment prove the propriety of the suggested parameters, algorithms and modifications.
 
+--[An image](images/an_image.jpg) 
 ### Example results
 
-Matching aerospace images
-
-![Feature based methods]({{ "/assets/pipeline.png" }})
+Registering aerospace images under season changes
 
 
+![Registering aerospace images under season changes](https://raw.githubusercontent.com/malashinroman/CSVA/gh-pages/_site/assets/season_change.png)
+
+Registering old and new images of NewYork: 1925 vs 2014
+
+![Registering old and new images of NewYork: 1925 vs 2014](https://raw.githubusercontent.com/malashinroman/CSVA/gh-pages/_site/assets/New_York_result.png)
+
+Filtered keypoint matches refer to the stable bridge configuration
+
+![Filtered keypoint matches](https://raw.githubusercontent.com/malashinroman/CSVA/gh-pages/_site/assets/New_York_result.png)
+
+![Registering old maps of Moscow](https://raw.githubusercontent.com/malashinroman/CSVA/gh-pages/_site/assets/Map_of_Moscow.png)
+
+![Matching under strong appearence change](https://raw.githubusercontent.com/malashinroman/CSVA/gh-pages/_site/assets/Peter_the_Great.jpg)
 
 
 > This is a blockquote following a header.
