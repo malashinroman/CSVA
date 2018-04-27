@@ -19,8 +19,11 @@ Outlier elimination is a crucial stage in keypoints-based methods (SIFT, SURF, B
 
 CSVA referes to the IV stage of the next figure
 
-![Feature based methods]({{ "/assets/matching_keypoints.jpg" }})
+![Feature based methods](https://raw.githubusercontent.com/malashinroman/CSVA/gh-pages/_site/assets/matching_keypoints.jpg)
 
+https://raw.githubusercontent.com/malashinroman/CSVA/gh-pages/assets/pipeline.png
+
+%![Branching](https://guides.github.com/activities/hello-world/branching.png)
 
 ## Algorithm pipeline
 
