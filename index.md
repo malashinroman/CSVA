@@ -47,26 +47,19 @@ Image registration upon the inliers
 
 ## Another results
 
-![Matching under strong appearence change](https://raw.githubusercontent.com/malashinroman/CSVA/gh-pages/_site/assets/Peter_the_Great.jpg){: .center-image }
+![Matching under strong appearence change](https://raw.githubusercontent.com/malashinroman/CSVA/gh-pages/_site/assets/3D another_.png){: .center-image }
 
 Matching under strong appearence changes.
 {: style="color:black; font-size: 100%; text-align: center;"}
 
-![Registering](https://raw.githubusercontent.com/malashinroman/CSVA/gh-pages/assets/nonstatic.png)
+![Registering](https://raw.githubusercontent.com/malashinroman/CSVA/gh-pages/assets/non-static_.png)
 
-![Registering](https://raw.githubusercontent.com/malashinroman/CSVA/gh-pages/assets/nonstatic2.png)
-
-Application of CSVA to dynamic scene matching; overall result of matching (top) and third largest cluster separately (bottom) . 
+Application of CSVA to dynamic scene matching; overall result of matching (left) and third largest cluster separately (right) . 
 {: style="color:black; font-size: 100%; text-align: center;"}
 
-![Registering](https://raw.githubusercontent.com/malashinroman/CSVA/gh-pages/_site/assets/season_change.png){: .center-image }
+![Registering]https://raw.githubusercontent.com/malashinroman/CSVA/gh-pages/assets/aerospace_2_.png{: .center-image }
 
-Registration under season changes
-{: style="color:black; font-size: 100%; text-align: center;"}
-
-![Registering old maps of Moscow](https://raw.githubusercontent.com/malashinroman/CSVA/gh-pages/_site/assets/Map_of_Moscow.png)
-
-Registration old maps of Moscow
+Registration under season changes (left), registration old maps of Moscow (right)
 {: style="color:black; font-size: 100%; text-align: center;"}
 
 
