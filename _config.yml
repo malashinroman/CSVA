@@ -1,7 +1,7 @@
 title: "Robust elimination of outliers in keypoint-based methods"
-email: malashinrom@mail.ru
+#email: malashinrom@mail.ru
 description: >- # this means to ignore newlines until "baseurl:"
-  CSVA: Structural verification of keypoint matches for SIFT, SURF, BRISK, etc
+  CSVA: Structural verification of keypoint matches
 baseurl:
 #"https://malashinroman.github.io/CSVA/" # the subpath of your site, e.g. /blog
 url: "https://malashinroman.github.io/CSVA/" # the base hostname & protocol for your site, e.g. http://example.com
