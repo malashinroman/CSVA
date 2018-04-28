@@ -1,6 +1,8 @@
 ---
 layout: default
 ---
+CSVA
+{: style="color:blue; font-size: 400%; text-align: center;"}
 # Briefly
 CSVA ("core" structural verification algorithm) is a robust and fast algorithm for outlier elimination of keypoint matches (e.g. SURF, SIFT or BRISK features). It can be used by developers and researches in different practical tasks with minor adaptation. 
 
@@ -57,7 +59,7 @@ Matching under strong appearence changes
 Application of CSVA to dynamic scene matching; overall result of matching (left) and third largest cluster separately (right)
 {: style="color:black; font-size: 100%; text-align: center;"}
 
-![Registering]https://raw.githubusercontent.com/malashinroman/CSVA/gh-pages/assets/aerospace_2_.png){: .center-image }
+![Registering](https://raw.githubusercontent.com/malashinroman/CSVA/gh-pages/assets/aerospace_2_.png){: .center-image }
 
 Registration under season changes (left), registration map against photo (right)
 {: style="color:black; font-size: 100%; text-align: center;"}
