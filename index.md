@@ -59,7 +59,7 @@ Matching under strong appearence changes
 Application of CSVA to dynamic scene matching; overall result of matching (left) and third largest cluster separately (right)
 {: style="color:black; font-size: 100%; text-align: center;"}
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/ik6-zfD-ozk" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen align="center"></iframe>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/ik6-zfD-ozk" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen align="middle"></iframe>
 
 Real-time tracking of multiple objects
 {: style="color:black; font-size: 100%; text-align: center;"}
