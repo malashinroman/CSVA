@@ -4,7 +4,7 @@ layout: default
 # Briefly
 CSVA ("core" structural verification algorithm) is a robust and fast algorithm for outlier elimination of keypoint matches (e.g. SURF, SIFT or BRISK features). It can be used by developers and researches in different practical tasks with minor adaptation. 
 
-| Method           | matches in avrg|precision, %|
+| Method           | matches in avg|precision, %|
 |:-------------    |:---------------|:-----------|
 | epipolar geometry|      285       |    53      |
 | proprietry SIFT  |      55        |    79      |
@@ -37,7 +37,7 @@ That makes possible registering aerospace images with less than 1% of inliers.
 Matching aerial images of New York of 1925 and 2014. Manmade changes have even affected the appearance of the coastline, but the configuration of the bridges remains the same.
 
 ![Filtered keypoint matches](https://raw.githubusercontent.com/malashinroman/CSVA/gh-pages/_site/assets/New_York_matches.png){: .center-image }
-Inliers according to CSVA describe the bridges (SURF + SIFT + CSVA).
+Inliers according to CSVA describe the bridges (SURF + SIFT + CSVA)
 {: style="color:black; font-size: 100%; text-align: center;"}
 
 ![Registering old and new images of NewYork: 1925 agains 2014](https://raw.githubusercontent.com/malashinroman/CSVA/gh-pages/_site/assets/New_York_result.png){: .center-image }
@@ -49,7 +49,7 @@ Image registration upon the inliers
 
 ![Matching under strong appearence change](https://raw.githubusercontent.com/malashinroman/CSVA/gh-pages/assets/3D%20another_.png){: .center-image }
 
-Matching under strong appearence changes.
+Matching under strong appearence changes
 {: style="color:black; font-size: 100%; text-align: center;"}
 
 ![Registering](https://raw.githubusercontent.com/malashinroman/CSVA/gh-pages/assets/non-static_.png)
@@ -57,7 +57,7 @@ Matching under strong appearence changes.
 Application of CSVA to dynamic scene matching; overall result of matching (left) and third largest cluster separately (right)
 {: style="color:black; font-size: 100%; text-align: center;"}
 
-![Registering]https://raw.githubusercontent.com/malashinroman/CSVA/gh-pages/assets/aerospace_2_.png{: .center-image }
+![Registering]https://raw.githubusercontent.com/malashinroman/CSVA/gh-pages/assets/aerospace_2_.png){: .center-image }
 
 Registration under season changes (left), registration map against photo (right)
 {: style="color:black; font-size: 100%; text-align: center;"}
@@ -91,7 +91,7 @@ If you find this code usefull please cite one or both of these papers
 
 ## More details
 
-Detailed explanation is given in this [paper](http://www.bookmetrix.com/detail/chapter/a7f25ed5-3900-4ab8-8631-d5da27cc1098#readers). I will make full access to it soon.
+Detailed explanation is given in this [paper](http://www.bookmetrix.com/detail/chapter/a7f25ed5-3900-4ab8-8631-d5da27cc1098#readers). Will be available soon.
 
 Here is some explanation without diving into details.
 
