@@ -5,7 +5,8 @@ layout: default
 {: style="color:blue; font-size: 250%; text-align: center;"}
 # Briefly
 CSVA ("core" structural verification algorithm) is a robust and fast algorithm for outlier elimination of keypoint matches (e.g. SURF, SIFT or BRISK features) that heavily exploits gemetrical constraints. It can be used by developers and researches in different practical tasks with minor adaptation. 
-
+:----------------------------------------------------
+|              matching 3D images                       |
 | Method           | matches in avg|precision, %|
 |:-------------    |:---------------|:-----------|
 | epipolar geometry|      285       |    53      |
