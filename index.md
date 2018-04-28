@@ -1,8 +1,8 @@
 ---
 layout: default
 ---
-CSVA
-{: style="color:blue; font-size: 400%; text-align: center;"}
+**CSVA**
+{: style="color:blue; font-size: 250%; text-align: center;"}
 # Briefly
 CSVA ("core" structural verification algorithm) is a robust and fast algorithm for outlier elimination of keypoint matches (e.g. SURF, SIFT or BRISK features). It can be used by developers and researches in different practical tasks with minor adaptation. 
 

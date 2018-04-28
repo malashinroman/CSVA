@@ -1,10 +1,11 @@
 ---
 layout: page
-title: About
-permalink: /about/
+title: Author
+permalink: /Author/
 ---
 
-This is project was made during my Phd course in 2014.
+I made this project during my Phd course in 2014.
 You can contact me by email: malashinroman@mail.ru
 
-Roman Malashin 2018(c)
+Roman Malashin, 
+2018
