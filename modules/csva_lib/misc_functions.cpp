@@ -193,7 +193,6 @@ int independentMatches(vector<DMatch> matches, vector<KeyPoint> pts1, vector<Key
 {
     int size = matches.size();
     vector<DMatch> copy(matches);
-    //printf("number of matches %d\n", matches.size());
     for(unsigned int i = 0; i < copy.size(); i++)
     {
         DMatch cmatch = copy.at(i);
@@ -206,16 +205,9 @@ int independentMatches(vector<DMatch> matches, vector<KeyPoint> pts1, vector<Key
                 copy.erase(copy.begin() + j);
                 j--;
                 size--;
-                //waitKey();
             }
         }
 
-    }
-    if(size != copy.size())
-    {
-        //int beda;
-        printf("beda!\n");
-        //system("pause");
     }
     matches = vector<DMatch>(copy);
     return copy.size();
@@ -265,22 +257,6 @@ double inline matchDistance(const DMatch& m1, const DMatch& m2, const vector<Key
     return dist1 < dist2 ? dist1 : dist2;
 }
 
-//void estimateHomo(const Mat& transfMat, double* scale, double* theta, double* ascale, double* direction)
-//{
-//    Point2f p1 = Point2f(1,1);
-//    Point2f p2 = Point2f(2,2);
-//    Point2f p1_ = WrapTransform(p1, transfMat);
-//    Point2f p2_ = WrapTransform(p2, transfMat);
-//
-//    double dist1 = euclideanDistacne(p1, p2);
-//    double dist2 = euclideanDistacne(p1_, p2_);
-//    *scale = dist2 / dist1;
-//
-//    double angle1 = atan2(p1.y - p2.y, p1.x - p2.x);
-//    double angle2 = atan2(p1_.y - p2_.y, p1_.x - p2_.x);
-//    *theta = (angle2 - angle1)*180 / CV_PI;
-//}
-
 void decomposeAffLutsiv(const Mat&  transfMat, double* scale, double* theta, double* ascale, double* direction)
 {
     double a1 = transfMat.at<double>(0,0);
@@ -294,9 +270,6 @@ void decomposeAffLutsiv(const Mat&  transfMat, double* scale, double* theta, dou
     double c = (-a2 + a3);
     double z = (a1 + a4);
     double Beta = atan2(c,z);
-    /*	double Beta_grad= Beta * 180. / CV_PI;
-    	double Beta2 = atan2(z,c);
-    	double Beta2_grad= Beta2 * 180. / CV_PI;*/
 
     double Alpha = 0.5*(atan2(a2 + a3, a1 - a4) - Beta);
 
@@ -346,8 +319,6 @@ void decomposeAff(const Mat& transfMat, Mat& Rot, Mat& Shear, Mat& Scale, double
     Scale.at<double>(1,1) = e*cos(Theta) - b*sin(Theta);
     Theta*=180 / CV_PI;
     Theta < 0 ? Theta + 360: Theta;
-    //Mat A, w, u, vt;
-    //SVD::compute(transfMat, w, u, vt);
 }
 
 void getScaleAndRotation(const Mat& transfMat, double& scale, double& angle)
@@ -432,7 +403,6 @@ vector<DMatch> excludeMany2OneMatches(const vector<DMatch>& matches, const vecto
 {
     int* ind = (int*)malloc(sizeof(int) * keypoints2.size());
 
-    //int* ind2 = (int*)malloc(sizeof(int)*matches.size());
     DMatch* matches_link = (DMatch*)malloc(sizeof(DMatch) * keypoints2.size());
     vector<DMatch> excluded_matches;
     for(int i = 0; i < keypoints2.size(); i++)
@@ -469,7 +439,6 @@ vector<DMatch> excludeMany2OneMatches(const vector<DMatch>& matches, const vecto
     free(ind);
     free(matches_link);
     return newmatches;
-    //return excluded_matches;
 }
 
 vector<DMatch> excludeOne2ManyMatches(const vector<DMatch>& matches, const vector<KeyPoint>& keypoints1, const vector<KeyPoint>& keypoints2)
@@ -511,7 +480,6 @@ vector<DMatch> excludeOne2ManyMatches(const vector<DMatch>& matches, const vecto
     free(ind);
     free(matches_link);
     return newmatches;
-    //return excluded_matches;
 }
 
 int findMatch(const DMatch& m, const vector<DMatch>& allmatches, int crossCheck)
@@ -531,7 +499,6 @@ int findMatch(const DMatch& m, const vector<DMatch>& allmatches, int crossCheck)
             if((train1 == train2) && (quer1 == quer2))
             {
                 int justflag = 0;
-                //return i;
             }
         }
         else
@@ -552,11 +519,6 @@ vector<DMatch> useNNratio(const vector<DMatch>& matches, double ratio)
     for(int i = 0; i < matches.size(); i++)
     {
         DMatch m = matches.at(i);
-        if(m.distance > 1)
-        {
-            printf("raio > 1!!!\n");
-            //system("pause");
-        }
         if(m.distance < ratio)
         {
             outMatches.push_back(m);

@@ -91,7 +91,6 @@ namespace csva
 		trM = mcl.fitModelParamsSimilarityRansac(kpts1, kpts2, image1, image2, 40, 0, 0.08, 30, 2.);
 		mcl.eliminateOutliers(kpts1, kpts2, 0.4, 0.2, 15, sqrt(2.), image1, image2, 0);
 		trM =  mcl.fitModelParams(kpts1, kpts2, SIMILARITY_TRANSFORM, 0, image1, image2);
-		//mcl.eliminateOutliers(kpts1, kpts2, 0.4, 0.9, 30, 2, image1, image2, 0);
 		
 		if (!trM.empty())
 		{
@@ -377,9 +376,7 @@ namespace csva
 		for (int i = 0; i < clusters.size(); i++)
 		{
 			Mat trM_;
-			//Cluster_data cl = potential_clusters.at(i);
 			vector<DMatch> matches = clusters.at(i);
-			//number_of_matches_in_clusters += matches.size();
 			Mat PT;
 			vector<DMatch> inliers = verify_cluster(matches, kpts1, kpts2, image1, image2, PT);
 			if (inliers.size() > 0 && !PT.empty())
@@ -397,7 +394,6 @@ namespace csva
 		if (!PT.empty() && inliers.size() > 0)
 		{
 			confidence = calculateConfidence(PT, inliers, kpts1, kpts2, im1, im2, excludedMatches, type, LoweProb);
-			//confidence[0] = pow(confidence[0], clusters_num);
 		}
 		return confidence;
 	}

@@ -37,7 +37,6 @@ Permission is hereby granted, free of charge, to any person obtaining
 #include "HoughList.h"
 using namespace cv;
 
-//enum HoughAccHashType { HashCpp11, HashManual, HashManualND};
 class Hough_Transform
 {
 private:
@@ -48,7 +47,6 @@ private:
 		int RANSAC_iter = 100, double RANSAC_inlierDistT = 0.1);
 public:
 	HoughListCpp houghListCpp;
-	int extended_output[4];
 	void excludeDuplicates();
 	void removeSmallClusters(int threshold, bool independent);
 	void ExcludeOne2ManyFromClusters();
@@ -62,8 +60,6 @@ public:
 	void FindClusters(int voteThresh);
 	Cluster_data MaxCluster();
 	
-	//void enrichClusters(double DistanceThreshProj, double DistanceThreshModel, double RotationThresh, double ScaleThresh, int transfType, vector<DMatch> matches = vector<DMatch>());
-
 	vector<DMatch> getAllClusterMatches();
 	vector<Cluster_data> clusters;
 	vector<DMatch> allmatches;
@@ -88,7 +84,6 @@ private:
 	Mat image2;
 	vector<KeyPoint> keypoints1;
 	vector<KeyPoint> keypoints2;
-	//HoughAccHashType hashtype = HashCpp11;
 	int NumXBin;
 	int NumYBin;
 
