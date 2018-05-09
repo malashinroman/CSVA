@@ -1,30 +1,63 @@
+/*
+Copyright (C) 2014  Roman Malashin
+Copyright (C) 2018  Roman Malashin
+
+All rights reserved.
+
+This is the Author's implementation of CSVA: "Core" structural verification algorithm [1]. Few unpublished modifications extensions are provided.
+
+[1] Malashin R.O. Core algorithm for structural verification of keypoint matches. Intelligent Systems Reference Library. Computer Vision in Control Systems-3. 2018. P. 251-286
+
+
+Permission is hereby granted, free of charge, to any person obtaining
+ a copy of this software and associated documentation files (the
+ "Software"), to deal in the Software without restriction, including
+ without limitation the rights to use, copy, modify, merge, publish,
+ distribute, sublicense, and/or sell copies of the Software, and to
+ permit persons to whom the Software is furnished to do so, subject to
+ the following conditions:
+ 
+ *The above copyright notice and this permission notice shall be included
+ in all copies or substantial portions of the Software.
+ 
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+ CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-//#include "3Drecognition.h"
 #include <opencv2/core.hpp>
 
 #include <iostream>
-#include "common_lib/DirectoryParser.h"
 #include "common_lib/feature_extractors.h"
-//#include "common_lib/misc.h"
-#include "common_lib/DirectoryParser.h"
 #include "csva_lib/csva.h"
-#include <time.h>
-#include "aerospace_demo.h"
 #include <opencv2/calib3d/calib3d.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui.hpp>
 #include <boost/filesystem.hpp>
 using namespace std;
 using namespace cv;
-#define DEBUG_SPEAKS 0
 #define SAVE_JPG_QUALITY 60
 
-//Mat EMPTY111;
+int makeDirectory(string folder)
+{
+	//alternative is	mkdir(folder.c_str());
+	boost::filesystem::create_directory(folder);
 
+//#ifdef WIN32
+//	mkdir(folder.c_str());
+//#else
+//	mkdir(folder.c_str(), 0700);
+//#endif
+	return 0;
+}
 Mat printMatches(vector<KeyPoint> pts1, vector<KeyPoint> pts2, vector<DMatch> matches, Mat image1, Mat image2, int flags)
 {
 	Mat outImage;
@@ -148,7 +181,6 @@ void main (int argc, char* argv[])
 	
 	Mat PT = csva::filter_matches(kpts1, kpts2, matches, image1, image2, 1, 352, inliers, confide, 0.01);
 	
-	//PT = homographyOpencv(inliers, kpts1, kpts2);
 	Mat res = printMatches(kpts1, kpts2, inliers, image1, image2, cv::DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS | cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
 	
 	boost::filesystem::path p(argv[1]);

@@ -1,3 +1,35 @@
+/*
+Copyright (C) 2014  Roman Malashin
+Copyright (C) 2018  Roman Malashin
+
+All rights reserved.
+
+This is the Author's implementation of CSVA: "Core" structural verification algorithm [1]. Few unpublished modifications extensions are provided.
+
+[1] Malashin R.O. Core algorithm for structural verification of keypoint matches. Intelligent Systems Reference Library. Computer Vision in Control Systems-3. 2018. P. 251-286
+
+
+Permission is hereby granted, free of charge, to any person obtaining
+ a copy of this software and associated documentation files (the
+ "Software"), to deal in the Software without restriction, including
+ without limitation the rights to use, copy, modify, merge, publish,
+ distribute, sublicense, and/or sell copies of the Software, and to
+ permit persons to whom the Software is furnished to do so, subject to
+ the following conditions:
+ 
+ *The above copyright notice and this permission notice shall be included
+ in all copies or substantial portions of the Software.
+ 
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+ CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
+
+
 #include "opencv2/core.hpp"
 #include <stdio.h>
 #include <stdlib.h>
@@ -505,18 +537,13 @@ void Hough_Transform::UseTransformConstraint(double initPointPercTh, double init
 	vector<DMatch> allfoundMatches;
 	int smallClusterSize = 4;
 	int i = 0;
-#if !defined(_DEBUG) && !defined(DEBUG_INFO_OUTPUT) && defined(OMP_OPTIMIZATION)
+#if !defined(_DEBUG) && defined(OMP_OPTIMIZATION)
 #pragma omp parallel for private(i) schedule(guided,1) //shared(newClusters)
 #endif
 	for (i = 0; i < this->clusters.size(); i++)
 	{
-		//!!!
 		int numthreads = omp_get_num_threads();
 		int numThread = omp_get_thread_num();
-		//printf("number_of_threads = %d\n", numthreads);
-		//#ifdef DEBUG_INFO_OUTPUT
-		//printf("this is thread N %d\n", numThread);
-		//#endif
 		int orSize = this->clusters.at(i).matches.size();
 		if (allfoundMatches.size() >= smallClusterSize)
 		{
@@ -528,8 +555,6 @@ void Hough_Transform::UseTransformConstraint(double initPointPercTh, double init
 		}
 		vector<DMatch> eliminatedMatches = UseTransfForCluster(this->clusters.at(i), initPointPercTh, initModelPercTh, InitialRotationThresh, InitialScaleThresh, transfType, delClThresh, hip_check, RANSAC_iter, RANSAC_inlierDistT);
 		vector<DMatch> foundMatches = this->clusters.at(i).matches;
-
-		//std::sort(foundMatches.begin(), foundMatches.end(), [](DMatch const& f, DMatch const& s){ return f.queryIdx > s.trainIdx;});
 
 		if (foundMatches.size() >= smallClusterSize)
 		{
@@ -558,7 +583,6 @@ vector<DMatch> Hough_Transform::UseTransfForCluster(Cluster_data& NewCData, doub
 	double meanDistance = DBL_MAX;
 	int repeat = 0;
 	double rejectDist = 140;
-	//distThresh = this->BinXSize / 2;
 	double ModelThresh = initModelPercTh;
 	double PointThresh = initPointPercTh;
 	double rotaionThresh = InitialRotationThresh;

@@ -2,7 +2,6 @@
 #include "opencv2/features2d/features2d.hpp"
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/features2d.hpp"
-//#include "opencv2/nonfree/features2d.hpp"
 #include "opencv2/xfeatures2d.hpp"
 #include <opencv2/calib3d/calib3d.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -10,7 +9,6 @@
 #include "common_lib/DirectoryParser.h"
 #include "csva_lib/csva.h"
 #include "3Drecognition.h"
-//#include "description\GfemFeatureDetectorExtractor.h"
 #include <time.h>
 using namespace cv;
 using namespace std;
@@ -31,5 +29,4 @@ void main(int argc, char* argv[])
 	vector<DMatch> inliers = call3D(argv[1], argv[2], &result, kpts1, kpts2, 352, 0, 0);
 	result = printMatches(kpts1, kpts2, inliers, image1, image2, 
 		DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS | DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
-	//My3D_Wrapper2()
 }

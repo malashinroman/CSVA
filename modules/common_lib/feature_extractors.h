@@ -2,7 +2,6 @@
 
 #include <stdio.h>
 #include <opencv2/core.hpp>
-//#include "KeyPointDatabase.h"
 #include "opencv2/features2d/features2d.hpp"
 #include <opencv2/xfeatures2d.hpp>
 using namespace cv;
@@ -79,7 +78,6 @@ public:
 	Ptr<BriefDescriptorExtractor> extractorBrief;
 	Ptr<BRISK> extractorBrisk;
 	Ptr<cv::ORB> extractorOrb;
-	//OrbDescriptorExtractor extractorOrb;
 	Ptr<FREAK> extractorFreak;
 	Ptr<LATCH> extractorLatch;
 	Ptr<AKAZE> extractorAkaze;
@@ -90,10 +88,6 @@ public:
 	FlannBasedMatcher matcher1;
 	BFMatcher matcher2;
 
-	//BFMatcher matcher_noCrossCheck(4, false);
-	//BFMatcher matcher_CrossCheck(4, true);
-	//BFMatcher matcher3(NORM_HAMMING2);
-	//BruteForceMatcher<Hamming> matcher3;
 	Ptr<DescriptorMatcher> matcher3;
 	void initDetectorDescriptors();
 
@@ -110,6 +104,3 @@ public:
 	vector<KeyPoint> getKeyPoints(Mat image, int type, int ConsoleOutput);
 	vector<KeyPoint> refineNotUniqueKeypoints(vector<KeyPoint> keypoints, Mat image, int k, double nnr_thresh, int type);
 };
-
-//void normalizeSamples(Mat& samples);
-//void getMatchedKeypoints(vector<DMatch>& matches, vector<KeyPoint> keypoints1, vector<KeyPoint> keypoints2, vector<KeyPoint>& matchedkeypoints1, vector<KeyPoint>& matchedkeypoints2);

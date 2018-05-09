@@ -1,3 +1,34 @@
+/*
+Copyright (C) 2014  Roman Malashin
+Copyright (C) 2018  Roman Malashin
+
+All rights reserved.
+
+This is the Author's implementation of CSVA: "Core" structural verification algorithm [1]. Few unpublished modifications extensions are provided.
+
+[1] Malashin R.O. Core algorithm for structural verification of keypoint matches. Intelligent Systems Reference Library. Computer Vision in Control Systems-3. 2018. P. 251-286
+
+
+Permission is hereby granted, free of charge, to any person obtaining
+ a copy of this software and associated documentation files (the
+ "Software"), to deal in the Software without restriction, including
+ without limitation the rights to use, copy, modify, merge, publish,
+ distribute, sublicense, and/or sell copies of the Software, and to
+ permit persons to whom the Software is furnished to do so, subject to
+ the following conditions:
+ 
+ *The above copyright notice and this permission notice shall be included
+ in all copies or substantial portions of the Software.
+ 
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+ CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
+
 #include <opencv2/core/core.hpp>
 using namespace cv;
 using namespace std;
@@ -7,12 +38,7 @@ using namespace std;
 #include "confidence_estimation.h"
 #include "opencv2/imgproc.hpp"
 #include "opencv2/highgui.hpp"
-//#include "aerospace_demo.h"
-//#include "3Drecognition.h"
-//#define DEBUG_INFO_OUTPUT
-#ifdef _DEBUG
-#include "misc_visualizers.h"
-#endif
+
 namespace csva
 {
 	vector<DMatch> verify_cluster(vector<DMatch> matches,  const vector<KeyPoint>& kpts1, const vector<KeyPoint>& kpts2, const Mat& image1, const Mat& image2, Mat& PT)
@@ -90,20 +116,10 @@ namespace csva
 		return mcl.matches;
 
 	}
-	//std::array<double, 6>  calculateConfidenceClusterData(Cluster_data& mcl, const vector<KeyPoint>& kpts1, const vector<KeyPoint>& kpts2, const Mat& image1, const Mat& image2,
-	//	const vector<DMatch>& excludedMatches, int type, Mat& PT, double LoweProb, int extoutput)
-	//{
-	//	return calculateConfidenceClusterData2(mcl, kpts1, kpts2, image1, image2, excludedMatches, type, PT, LoweProb, extoutput);
-	//}
 
 	vector<DMatch> matchesHoughConstraint(Mat image1, Mat image2, Mat* matchresult, vector<KeyPoint> points1, vector<KeyPoint> points2, vector<DMatch> matches, int graphicalOuput, int consoleOuput)
 	{
-		/*int num = 1;
-		int hip_check = 0;
-		int ransac_iterations = 27;
-		double delClThresh = 0.3;
-		double RANSAC_inlierdist = sqrt((double)(image2.size().width * image2.size().width)+(image2.size().height * image2.size().height)) * 0.08;*/
-
+		
 		double RANSAC_inlierdist = sqrt((double)(image2.size().width * image2.size().width) + (image2.size().height * image2.size().height)) * 0.06;
 
 		int maxres = 0.8 * sqrt(1.*image2.size().width*image2.size().width + image2.size().height*image2.size().height);//image1.size().width > image1.size().height ? image1.size().width : image1.size().height; //
@@ -145,47 +161,11 @@ namespace csva
 				smallClusterSize = 5;
 			}
 		}
-		//if (consoleOuput)
-		//{
-		//	printf("transform constraint time = %d ms\n", (chpoint3 - start) * 1000 / CLOCKS_PER_SEC);
-		//	printf("smallClusterSize = %d\n", smallClusterSize);
-		//}
-		//////system("pause");
-		//if (graphicalOuput)
-		//{
-		//	HoughTransform.ShowClusters(HoughTransform.clusters, 3, "After Elimination");
-		//}
-
-		//HoughTransform.removeSmallClusters(smallClusterSize, false);
-		//if (graphicalOuput)
-		//{
-		//	HoughTransform.extended_output[1] = 1;
-		//}
-
-		//HoughTransform.excludeDuplicates();
-		//if (graphicalOuput)
-		//{
-		//	HoughTransform.ShowClusters(HoughTransform.clusters, 3, "excluded duplicates");
-		//}
+		
 		HoughTransform.ExcludeMany2OneFromClusters();
 		HoughTransform.ExcludeOne2ManyFromClusters();
 		HoughTransform.removeSmallClusters(smallClusterSize - 1, false);
 
-		//if (matchresult != NULL)
-		//{
-		//	clock_t finish = clock();
-		//	start = clock();
-		//	*matchresult = HoughTransform.printClusters(HoughTransform.clusters, -1);
-		//	clock_t chpoint5 = clock();
-		//	if (consoleOuput)
-		//	{
-		//		printf("\nprint time = %d ms\n", (chpoint5 - start) * 1000 / CLOCKS_PER_SEC);
-		//	}
-		//}
-		//if (graphicalOuput)
-		//{
-		//	HoughTransform.ShowClusters(HoughTransform.clusters, 3, "final");
-		//}
 		return HoughTransform.getAllClusterMatches();
 	}
 
@@ -275,10 +255,7 @@ namespace csva
 		{
 			
 			vector<DMatch> cluster_matches = clusters.at(i);
-#ifdef _DEBUG
-			result = printMatches(kpts1, kpts2, cluster_matches, image1, image2);
-			//showMatches(kpts1, kpts2, cluster_matches, image1, image2, "initial", 1);
-#endif
+
 			if (allfoundMatches.size() >= demanded_size_of_cluster)
 			{
 				std::sort(cluster_matches.begin(), cluster_matches.end(), compareMatches);
@@ -287,10 +264,7 @@ namespace csva
 				tmp.resize(it - tmp.begin());
 				cluster_matches = tmp;
 			}
-#ifdef _DEBUG
-			result = printMatches(kpts1, kpts2, cluster_matches, image1, image2);
-			//showMatches(kpts1, kpts2, cluster_matches, image1, image2, "excluded_dups", 1);
-#endif
+
 			Mat PT;
 
 			vector<DMatch> inliers_in_cluster = verify_cluster3D(cluster_matches, kpts1, kpts2, image1, image2, PT);
@@ -300,17 +274,12 @@ namespace csva
 			}
 			
 			array<double, 6> conf = csva::confidence_estimation(inliers_in_cluster, PT, kpts1, kpts2, goodmatches, image1, image2, 0, type, LoweProb * 2);
-#ifdef _DEBUG
-			printf("confid: %f\n", conf[0]);
-			result = printMatches(kpts1, kpts2, inliers_in_cluster, image1, image2);
-			//showMatches(kpts1, kpts2, inliers_in_cluster, image1, image2, "inliers", 1);
-#endif
+
 			
 			if (conf[0] < 0.95)
 			{
 				continue;
 			}
-			//csva::confidence_estimation(inliers_in_cluster, PT, kpts1, kpts2, goodmatches, image1, image2, 0, type, LoweProb);
 			for (DMatch m : inliers_in_cluster)
 			{
 				allfoundMatches.push_back(m);
@@ -318,10 +287,6 @@ namespace csva
 			std::sort(allfoundMatches.begin(), allfoundMatches.end(), compareMatches);
 		}
 		inliers = allfoundMatches;
-#ifdef _DEBUG
-		result = printMatches(kpts1, kpts2, inliers, image1, image2);
-		//showMatches(kpts1, kpts2, inliers, image1, image2, "sfs", 1);
-#endif
 
 	}
 	
@@ -377,9 +342,6 @@ namespace csva
 			}
 			HoughTransform.FindClusters(vote_thresh);
 			potential_clusters = HoughTransform.clusters;
-#ifdef DEBUG_INFO_OUTPUT
-			HoughTransform.ShowClusters(potential_clusters, 3, "clusters");
-#endif
 		}
 		else
 		{
@@ -400,88 +362,18 @@ namespace csva
 			HoughTransform2.FindClusters(vote_thresh);
 			potential_clusters = HoughTransform1.clusters;
 			potential_clusters.insert(potential_clusters.end(), HoughTransform2.clusters.begin(), HoughTransform2.clusters.end());
-#ifdef DEBUG_INFO_OUTPUT
-			HoughTransform1.ShowClusters(potential_clusters, 3, "clusters");
-			HoughTransform1.ShowClusters(3, "clusters1");
-			HoughTransform2.ShowClusters(3, "clusters1");
-#endif
 		}
 
-		//vector< vector<DMatch> > clusters;
 		for (Cluster_data c: potential_clusters)
 		{
 			clusters.push_back(c.matches);
 		}
 	}
-//
-//	CSVA_LIB_API void hough_transform2(const vector<KeyPoint>& kpts1, const vector<KeyPoint>& kpts2, const vector<DMatch>& matches, const Mat& image1, const Mat& image2, vector<vector<DMatch> >& clusters, int vote_thresh)
-//	{
-//		vector<DMatch> goodmatches = matches;
-//		bool useOneAcc = true;
-//		Cluster_data mcl_max;
-//		int max_cluster_size = 0;
-//		int maxres = 0.8 * sqrt(1.*image2.size().width*image2.size().width + image2.size().height*image2.size().height);//image1.size().width > image1.size().height ? image1.size().width : image1.size().height; //
-//		
-//		vector<Cluster_data> potential_clusters;
-//		if (useOneAcc)
-//		{
-//			Hough_Transform HoughTransform(((double)(360.)) / 24., maxres / 8., maxres / 8., 2., image1, image2);
-//			//Hough_Transform HoughTransform(((double)(360.)) / 12., maxres / 8, maxres / 8, 2, image1, image2);
-//			HoughTransform.FillAcc(kpts1, kpts2, goodmatches);
-//			mcl_max = HoughTransform.MaxCluster();
-//			max_cluster_size = mcl_max.matches.size();
-//			if (!vote_thresh)
-//			{
-//				vote_thresh = mcl_max.matches.size() * 0.6;
-//			}
-//			if (vote_thresh < 3)
-//			{
-//				vote_thresh = 3;
-//			}
-//			HoughTransform.FindClusters(vote_thresh);
-//			potential_clusters = HoughTransform.clusters;
-//#ifdef DEBUG_INFO_OUTPUT
-//			HoughTransform.ShowClusters(potential_clusters, 3, "clusters");
-//#endif
-//		}
-//		else
-//		{
-//			Hough_Transform HoughTransform1(((double)(360.)) / 8, maxres / 3, maxres / 3, 2., image1, image2);
-//			Hough_Transform HoughTransform2(((double)(360.)) / 8, maxres / 3, maxres / 3, 2., image1, image2);
-//			HoughTransform1.FillAccNewBoundary(kpts1, kpts2, goodmatches, 1);
-//			HoughTransform2.FillAccNewBoundary(kpts1, kpts2, goodmatches, 0);
-//			Cluster_data mcl_max1 = HoughTransform1.MaxCluster();
-//			Cluster_data mcl_max2 = HoughTransform2.MaxCluster();
-//			mcl_max = mcl_max1.matches.size() > mcl_max2.matches.size() ? mcl_max1 : mcl_max2;
-//			max_cluster_size = mcl_max.matches.size();
-//			int vote_thresh = mcl_max.matches.size() * 0.6;
-//			if (vote_thresh < 3)
-//			{
-//				vote_thresh = 3;
-//			}
-//			HoughTransform1.FindClusters(vote_thresh);
-//			HoughTransform2.FindClusters(vote_thresh);
-//			potential_clusters = HoughTransform1.clusters;
-//			potential_clusters.insert(potential_clusters.end(), HoughTransform2.clusters.begin(), HoughTransform2.clusters.end());
-//#ifdef DEBUG_INFO_OUTPUT
-//			HoughTransform1.ShowClusters(potential_clusters, 3, "clusters");
-//			HoughTransform1.ShowClusters(3, "clusters1");
-//			HoughTransform2.ShowClusters(3, "clusters1");
-//#endif
-//		}
-//
-//		//vector< vector<DMatch> > clusters;
-//		for (Cluster_data c : potential_clusters)
-//		{
-//			clusters.push_back(c.matches);
-//		}
-//	}
 
 	CSVA_LIB_API void verify_clusters(const vector< vector<DMatch> >& clusters, vector< vector<DMatch> >& filtered, 
 		vector<Mat>& transforms, const vector<KeyPoint>& kpts1, 
 		const vector<KeyPoint>& kpts2, const Mat& image1, const Mat& image2)
 	{
-		//int number_of_matches_in_clusters;
 		for (int i = 0; i < clusters.size(); i++)
 		{
 			Mat trM_;

@@ -1,18 +1,15 @@
-#include "misc.h"
+//#include "misc.h"
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
-//#include "opencv2/features2d/features2d.hpp"
 #include "opencv2/highgui/highgui.hpp"
 
 #include "time.h"
 #include "opencv2/objdetect/objdetect.hpp"
-//#include <opencv2/xfeatures2d.hpp>
 #include <opencv2/calib3d/calib3d.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <boost/algorithm/minmax.hpp>
 #include <boost/algorithm/minmax_element.hpp>
 #include <iostream>
-//#include "misc.h"
 #include "feature_extractors.h"
 
 using namespace cv;
@@ -74,13 +71,6 @@ void getDenseKeypoints(Mat image, vector<KeyPoint>& keypoints)
 vector<KeyPoint> OpenCVfeatures::getKeyPoints(Mat image, int type, int ConsoleOutput)
 {
     vector<KeyPoint> points;
-	//if (!this->globalInitializationDescriptors)
- //   {
-	//	this->initDetectorDescriptors();
- //   }
-
-    //-- Step 1: Detect the keypoints using SURF Detector
-    clock_t start = clock();
 
     if(type % 10 == AGAST_DETECTOR_TYPE)
     {
@@ -263,14 +253,7 @@ Mat OpenCVfeatures::getDescriptors(Mat image, vector<KeyPoint>& points, int type
         }
 		this->extractorFreak->compute(image, points, descriptors);
     }
-    //if( (type % 100) / 10 == HOG_DESCRIPTOR_TYPE / 10 )
-    //{
-    //    descriptors = getHogDescriptors(image, points);
-    //    if(ConsoleOutput)
-    //    {
-    //        printf("HOG_DESCRIPTOR_TYPE\n");
-    //    }
-    //}
+
     if( (type % 100) / 10 == DAISY_DESCRIPTOR_TYPE / 10 )
     {
 
@@ -449,9 +432,6 @@ vector<DMatch> getBowMatches(vector<KeyPoint>& keypoints1, vector<KeyPoint>& key
         printf("Bowide Init\n");
         //initVocabulary(type);
     }
-    /*SurfFeatureDetector detector(200);
-    detector.detect(image1, keypoints1);
-    detector.detect(image2, keypoints2);*/
     Mat descriptors1;
     Mat descriptors2;
     vector<vector<int>> pointIndexes1;
@@ -507,14 +487,8 @@ vector<DMatch> useNNratio(vector<DMatch> matches, double ratio)
 vector<KeyPoint> OpenCVfeatures::refineNotUniqueKeypoints(vector<KeyPoint> keypoints, Mat image, int k, double nnr_thresh, int type)
 {
 	Mat descs = OpenCVfeatures::getDescriptors(image, keypoints, type, 0);
-	//matcher3->match(descs1, descs2, matches);
 	vector<vector<DMatch>> couplemathces;
-	Mat mask = Mat();// Mat::ones(keypoints.size(), keypoints.size(), CV_8U);
-	/*for (int i = 0; i < keypoints.size(); i++)
-	{
-		mask.at<char>(i, i) = 0;
-	}*/
-	//int k = 2;
+	Mat mask = Mat();
 	if ((type % 100) / 10 == BRISK_DESCRIPTOR_TYPE / 10)
 	{
 		this->matcher3->knnMatch(descs, descs, couplemathces, k);
@@ -528,8 +502,6 @@ vector<KeyPoint> OpenCVfeatures::refineNotUniqueKeypoints(vector<KeyPoint> keypo
 	{
 		DMatch m1 = couplemathces.at(i).at(1);
 		DMatch m2 = couplemathces.at(i).at(k - 1);
-		//assert(m1.queryIdx == m2.queryIdx);
-		//assert(m1.trainIdx == m2.trainIdx);
 		double nnr = m1.distance / m2.distance;
 		if (nnr < nnr_thresh)
 		{
@@ -542,7 +514,6 @@ void OpenCVfeatures::initDetectorDescriptors()
 {
 	detectorSift = SIFT::create();
 	detectorSurf = SURF::create(112);
-	//detectorSurf =  SURF::create(50);
 	detectorFast = cv::FastFeatureDetector::create();
 	detectorMser = MSER::create(5, 30);
 	detectorStar = StarDetector::create();
@@ -562,8 +533,6 @@ void OpenCVfeatures::initDetectorDescriptors()
 	extractorBrisk = cv::BRISK::create();
 	extractorLucid = LUCID::create(3, 2);
 	extractorDaisy = DAISY::create();
-
-	//extractorFreak = cv::FREAK::create();
 	matcher3 = cv::DescriptorMatcher::create("BruteForce-Hamming");
 	vggfeatures = VGG::create();
 	globalInitializationDescriptors = true;
@@ -600,58 +569,26 @@ OpenCVfeatures::~OpenCVfeatures()
 {
 	this->releaseDetectorDescriptors();
 }
-vector<DMatch> OpenCVfeatures::getLocalPatchMatches2(Mat image1, Mat image2, vector<KeyPoint>& points1, vector<KeyPoint>& points2, int type, int* detectionTime, int* descriptionTime, int* matchingTime, int ConsoleOutput)
+vector<DMatch> OpenCVfeatures::getLocalPatchMatches2(Mat image1, Mat image2, vector<KeyPoint>& points1, vector<KeyPoint>& points2, 
+	int type, int* detectionTime, int* descriptionTime, int* matchingTime, int ConsoleOutput)
 {
     Mat descriptors_1, descriptors_2;
-    clock_t start, finish;
-
-    //-- Step 1: Detect the keypoints using SURF Detector
-    start = clock();
     points1 = getKeyPoints(image1, type, ConsoleOutput);
     points2 = getKeyPoints(image2, type, ConsoleOutput);
-    finish = clock();
-    *detectionTime = (finish - start) * 1000 / CLOCKS_PER_SEC;
     if(ConsoleOutput)
     {
         printf("detection time = %d ms\n", *detectionTime);
     }
-    //-- Step 2: Calculate descriptors (feature vectors)
-    start = clock();
-
-    if((type % 1000) / 100 == BOW_MATCHING / 100)
-    {
-        printf("BOW_MATCHING\n");
-        vector<DMatch> matches = getBowMatches(points1, points2, image1, image2, type, 10);
-        return matches;
-    }
     descriptors_1 = getDescriptors(image1, points1, type, ConsoleOutput);
     descriptors_2 = getDescriptors(image2, points2, type, ConsoleOutput);
-    finish =clock();
-    *descriptionTime = (finish - start) * 1000 / CLOCKS_PER_SEC;
-    if(ConsoleOutput)
-    {
-        printf("description time = %d ms\n", *descriptionTime);
-    }
-    //	}
-
-    start = clock();
     vector<DMatch> matches;
-    if(ConsoleOutput)
-    {
-        cout<<"desriptor.size = " << descriptors_1.size() << endl;
-    }
+    
     if ((descriptors_1.size().height == 0) || descriptors_2.size().height == 0)
     {
     }
     else
     {
         matches = getMatches(descriptors_1, descriptors_2, type, ConsoleOutput);
-    }
-    finish = clock();
-    *matchingTime = (finish - start) * 1000 / CLOCKS_PER_SEC;
-    if(ConsoleOutput)
-    {
-        printf("NN matching time = %d ms\n", *matchingTime);
     }
     return matches;
 }
