@@ -1,0 +1,7 @@
+.idea/
+build/
+
+cmake/config
+cmake/config_lin
+build_new
+build_super_new

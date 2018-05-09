@@ -1,0 +1,22 @@
+PROJECT( match_aero )
+cmake_minimum_required(VERSION 3.4)
+
+FIND_PACKAGE( OpenCV 3.1 REQUIRED core imgproc highgui)
+include_directories(${OpenCV_INCLUDE_DIRS})
+
+if (UNIX)
+	find_package(Boost REQUIRED COMPONENTS filesystem)
+	INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIRS} )
+	#find_package(Eigen REQUIRED)
+endif (UNIX)
+
+if (WIN32)
+	find_package(Boost REQUIRED)
+	include_directories(${Boost_INCLUDE_DIRS})
+	set (CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS OFF)
+	link_directories(${Boost_LIBRARY_DIR})
+	message(${Boost_LIBRARY_DIR})
+endif (WIN32)
+add_compile_options(-std=c++11)
+ADD_EXECUTABLE(match_aero  aerospace_demo.h aerospace_demo.cpp)
+TARGET_LINK_LIBRARIES(match_aero csva_lib common_lib ${OpenCV_LIBS})
