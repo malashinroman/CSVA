@@ -29,7 +29,6 @@ Permission is hereby granted, free of charge, to any person obtaining
  SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#pragma once
 #include "HoughList.h"
 
 

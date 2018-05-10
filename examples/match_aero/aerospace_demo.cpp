@@ -133,7 +133,7 @@ int main (int argc, char* argv[])
 	if (argc < 3)
 	{
 		cout << "match_aero image1 image2 " << endl;
-        return 1;
+		return -1;
 	}
 	Mat im1 = imread(argv[1]);
 	Mat im2 = imread(argv[2]);
@@ -175,7 +175,7 @@ int main (int argc, char* argv[])
 	Mat outim;
 	Mat imageMask, xoredImage, alignedImages;
 	Mat imageMaskc, xoredImagec, alignedImagesc;
-	char* res_file_name = "shalalla.jpg";
+	//char* res_file_name = "shalalla.jpg";
 	vector<DMatch> inliers;
 	double confide[6];
 	
@@ -231,6 +231,6 @@ int main (int argc, char* argv[])
 		Mat m = mergeImages(image1, image2, 1);
 		m.copyTo(result);
 	}
+        return 0;
+}  
 
-    return 0;
-}

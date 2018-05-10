@@ -29,6 +29,5 @@ int main(int argc, char* argv[])
 	vector<DMatch> inliers = call3D(argv[1], argv[2], &result, kpts1, kpts2, 352, 0, 0);
 	result = printMatches(kpts1, kpts2, inliers, image1, image2, 
 		DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS | DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
-
     return 0;
 }

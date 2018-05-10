@@ -532,8 +532,8 @@ void Hough_Transform::UseTransformConstraint(double initPointPercTh, double init
 #endif
 	for (size_t i = 0; i < this->clusters.size(); i++)
 	{
-		int numthreads = omp_get_num_threads();
-		int numThread = omp_get_thread_num();
+	//	int numthreads = omp_get_num_threads();
+	//	int numThread = omp_get_thread_num();
 		int orSize = this->clusters.at(i).matches.size();
 		if (allfoundMatches.size() >= smallClusterSize)
 		{
@@ -563,7 +563,7 @@ void Hough_Transform::UseTransformConstraint(double initPointPercTh, double init
 			}
 		}
 	}
-	int numthreads = omp_get_num_threads();
+	//int numthreads = omp_get_num_threads();
 	this->sortClusters();
 }
 
