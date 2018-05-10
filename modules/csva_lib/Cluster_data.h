@@ -57,7 +57,7 @@ public:
 	Mat transfMat;
 
 	void exclude(DMatch match);
-	Mat Cluster_data::fitModelParams(const vector<KeyPoint>& keypoints1, const vector<KeyPoint>& keypoints2,
+    Mat fitModelParams(const vector<KeyPoint>& keypoints1, const vector<KeyPoint>& keypoints2,
 		TransformType transfType, int extended_output,
 		Mat image1 = Mat(), Mat image2 = Mat(), 
 		double inlier_dist = 0, int iter = 0, int hip_check = 0, double deleteThresh = 0.2);;

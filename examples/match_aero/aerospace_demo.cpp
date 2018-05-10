@@ -128,12 +128,12 @@ Mat mergeImages(Mat img1, Mat img2, int topdown)
 		return outImage;
 	}
 }
-void main (int argc, char* argv[])
+int main (int argc, char* argv[])
 {
 	if (argc < 3)
 	{
 		cout << "match_aero image1 image2 " << endl;
-		return;
+        return 1;
 	}
 	Mat im1 = imread(argv[1]);
 	Mat im2 = imread(argv[2]);
@@ -231,4 +231,6 @@ void main (int argc, char* argv[])
 		Mat m = mergeImages(image1, image2, 1);
 		m.copyTo(result);
 	}
-}  
+
+    return 0;
+}

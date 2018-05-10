@@ -19,7 +19,7 @@ Mat printMatches(vector<KeyPoint> pts1, vector<KeyPoint> pts2, vector<DMatch> ma
 	drawMatches(image1, pts1, image2, pts2, matches, outImage, CV_RGB(0, 255, 0), CV_RGB(0, 255, 0), vector<char>(), flags);
 	return outImage;
 }
-void main(int argc, char* argv[])
+int main(int argc, char* argv[])
 {
 	Mat result;
 	vector<KeyPoint> kpts1;
@@ -29,4 +29,6 @@ void main(int argc, char* argv[])
 	vector<DMatch> inliers = call3D(argv[1], argv[2], &result, kpts1, kpts2, 352, 0, 0);
 	result = printMatches(kpts1, kpts2, inliers, image1, image2, 
 		DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS | DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
+
+    return 0;
 }

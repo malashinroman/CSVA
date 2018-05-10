@@ -5,7 +5,7 @@ FIND_PACKAGE( OpenCV 3.1 REQUIRED core imgproc highgui)
 include_directories(${OpenCV_INCLUDE_DIRS})
 
 if (UNIX)
-	find_package(Boost REQUIRED COMPONENTS filesystem)
+        find_package(Boost REQUIRED COMPONENTS filesystem system)
 	INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIRS} )
 endif (UNIX)
 
@@ -19,4 +19,4 @@ endif (WIN32)
 
 add_compile_options(-std=c++11)
 ADD_EXECUTABLE(match_aero aerospace_demo.cpp)
-TARGET_LINK_LIBRARIES(match_aero csva_lib common_lib ${OpenCV_LIBS})
+TARGET_LINK_LIBRARIES(match_aero csva_lib common_lib ${OpenCV_LIBS} ${Boost_LIBRARIES})
