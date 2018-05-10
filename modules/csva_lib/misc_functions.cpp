@@ -98,7 +98,7 @@ Point2f WrapTransform(Point2f SamplePoint, const Mat& trMatrix)
     return np;
 }
 
-inline double euclideanDistacne(Point2f p1, Point2f p2)
+double euclideanDistacne(Point2f p1, Point2f p2)
 {
     return sqrt((double)(p1.x - p2.x)*(p1.x - p2.x) + (p1.y - p2.y)*(p1.y - p2.y));
 }
@@ -170,7 +170,7 @@ Point2f predictModelPosition(const KeyPoint& point1, const KeyPoint& point2, Poi
 *	opencv - 0-360 clockwise
 *	good [0,360] counter clockwise
 */
-inline double convertOpencvAngle2GoodAnglePositive(double angle_opencv)
+double convertOpencvAngle2GoodAnglePositive(double angle_opencv)
 {
 
     double goodAngle = 360 - angle_opencv;
@@ -181,7 +181,7 @@ inline double convertOpencvAngle2GoodAnglePositive(double angle_opencv)
 *	opencv - 0-360 clockwise
 *	good [-180,180] counter clockwise
 */
-inline double convertOpencvAngle2GoodAngle(double angle_opencv)
+double convertOpencvAngle2GoodAngle(double angle_opencv)
 {
 
     double goodAngle = 360 - angle_opencv;

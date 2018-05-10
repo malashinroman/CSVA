@@ -52,9 +52,9 @@ Point2f WrapTransform(Point2f SamplePoint, const Mat& trMatrix);
 
 vector<Point2f> WrapTransform(vector<Point2f>& SamplePoint, const Mat& trMatrix);
 
-inline double euclideanDistacne(Point2f p1, Point2f p2);
+double euclideanDistacne(Point2f p1, Point2f p2);
 
-inline double  convertOpencvAngle2GoodAngle(double angle_opencv);
+double  convertOpencvAngle2GoodAngle(double angle_opencv);
 
 Point2f  predictModelPosition(const KeyPoint& point1, const KeyPoint& point2, Point2f ModelPoint);
 
