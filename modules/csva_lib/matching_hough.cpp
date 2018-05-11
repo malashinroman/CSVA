@@ -52,11 +52,6 @@ using namespace std;
 */
 Hough_Transform::Hough_Transform(double BinOrSize, double BinXSize, double BinYSize, double BinScFactor, Mat image1, Mat image2/*, HoughAccHashType hashtype*/)
 {
-	memset(extended_output, 0, sizeof(int)* 4);
-
-
-	/*assert((hashtype == HashManualND) || (hashtype == HashManual) || (hashtype == HashCpp11));*/
-	//this->hashtype = hashtype;
 	this->image1 = image1.clone();
 	this->image2 = image2.clone();
 
@@ -608,7 +603,7 @@ vector<DMatch> Hough_Transform::UseTransfForCluster(Cluster_data& NewCData, doub
 	ratio /= NewCData.matches.size();
 	
 	double inlier_dist = RANSAC_inlierDistT;
-	NewCData.fitModelParams(this->keypoints1, this->keypoints2, transfType, this->extended_output[0], image1, image2, inlier_dist, RANSAC_iter, hip_check, deleteClusterThresh);
+	NewCData.fitModelParams(this->keypoints1, this->keypoints2, transfType, 0, image1, image2, inlier_dist, RANSAC_iter, hip_check, deleteClusterThresh);
 	TransformType transfTypeNew = TransformType::SIMILARITY_TRANSFORM;
 	if (transfType == TransformType::AFFINE_TRANSFORM)
 	{
@@ -616,11 +611,11 @@ vector<DMatch> Hough_Transform::UseTransfForCluster(Cluster_data& NewCData, doub
 	}
 	if (transfType != TransformType::OPENCV_HOMOGRAPHY_RANSAC)
 	{
-		NewCData.fitModelParams(this->keypoints1, this->keypoints2, transfTypeNew, this->extended_output[0], image1, image2);
+		NewCData.fitModelParams(this->keypoints1, this->keypoints2, transfTypeNew, 0, image1, image2);
 	}
 	int tmp = NewCData.transfMat.size().width;
 	vector<DMatch> eliminatedMatches;
-	eliminatedMatches = NewCData.eliminateOutliers(this->keypoints1, this->keypoints2, PointThresh, ModelThresh, rotaionThresh, scaleThresh, this->image1, this->image2, this->extended_output[0]);
+	eliminatedMatches = NewCData.eliminateOutliers(this->keypoints1, this->keypoints2, PointThresh, ModelThresh, rotaionThresh, scaleThresh, this->image1, this->image2, 0);
 	allEliminatedMatches.insert(allEliminatedMatches.end(), eliminatedMatches.begin(), eliminatedMatches.end());
 
 	return allEliminatedMatches;

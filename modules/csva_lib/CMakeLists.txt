@@ -31,5 +31,5 @@ confidence_estimation.cpp
 )
 
 TARGET_LINK_LIBRARIES(csva_lib  ${Boost_LIBRARIES} ${OpenCV_LIBS})
-set(${PROJECT_NAME}_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/include
-    				`CACHE INTERNAL "${PROJECT_NAME}: Include Directories" FORCE)
+#set(${PROJECT_NAME}_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/include
+#   				`CACHE INTERNAL "${PROJECT_NAME}: Include Directories" FORCE)

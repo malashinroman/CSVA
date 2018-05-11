@@ -37,7 +37,6 @@ Permission is hereby granted, free of charge, to any person obtaining
 #include <opencv2/calib3d/calib3d.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include "common_lib/feature_extractors.h"
-#include "common_lib/DirectoryParser.h"
 #include "csva_lib/csva.h"
 #include "3Drecognition.h"
 #include <time.h>

@@ -2,3 +2,5 @@
 build/
 
 cmake/config
+cmake/config
+cmake/config_lin

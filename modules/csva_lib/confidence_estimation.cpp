@@ -33,7 +33,7 @@ Permission is hereby granted, free of charge, to any person obtaining
 #include <stdlib.h>
 #include <string.h>
 
-#include "3Drecognition.h"
+//#include "3Drecognition.h"
 
 #include "misc_functions.h"
 
@@ -44,7 +44,7 @@ Permission is hereby granted, free of charge, to any person obtaining
 #include "opencv2/highgui/highgui.hpp"
 #include <opencv2/imgproc.hpp>
 #include "misc_functions.h"
-
+#include "csva_lib/Cluster_data.h"
 using namespace std;
 using namespace cv;
 

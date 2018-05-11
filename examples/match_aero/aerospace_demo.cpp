@@ -191,7 +191,6 @@ void main (int argc, char* argv[])
 	Mat result;
 	if (!PT.empty())
 	{
-		if (DEBUG_SPEAKS) cout << "transformApplied" << endl << PT;
 		cv::warpPerspective(image1, image1_proj, PT, image2.size());
 		cv::warpPerspective(image1c, image1_projc, PT, image2.size());
 

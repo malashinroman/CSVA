@@ -90,7 +90,7 @@ namespace csva
 		mcl.matches = matches;
 		trM = mcl.fitModelParamsSimilarityRansac(kpts1, kpts2, image1, image2, 40, 0, 0.08, 30, 2.);
 		mcl.eliminateOutliers(kpts1, kpts2, 0.4, 0.2, 15, sqrt(2.), image1, image2, 0);
-		trM =  mcl.fitModelParams(kpts1, kpts2, SIMILARITY_TRANSFORM, 0, image1, image2);
+		trM =  mcl.fitModelParams(kpts1, kpts2, TransformType::SIMILARITY_TRANSFORM, 0, image1, image2);
 		
 		if (!trM.empty())
 		{
@@ -121,11 +121,10 @@ namespace csva
 		
 		double RANSAC_inlierdist = sqrt((double)(image2.size().width * image2.size().width) + (image2.size().height * image2.size().height)) * 0.06;
 
-		int maxres = 0.8 * sqrt(1.*image2.size().width*image2.size().width + image2.size().height*image2.size().height);//image1.size().width > image1.size().height ? image1.size().width : image1.size().height; //
+		int maxres = static_cast<int>(0.8 * sqrt(1.*image2.size().width*image2.size().width + image2.size().height*image2.size().height));
 		Hough_Transform HoughTransform(((double)(360.)) / 24., maxres / 8., maxres / 8., 2., image1, image2);
 		int demanded_size_of_cluster = matches.size() / 100;
 		demanded_size_of_cluster = demanded_size_of_cluster < 3 ? 4 : demanded_size_of_cluster < 5 ? 5 : demanded_size_of_cluster;
-		//clock_t start = clock();
 		if (1)
 		{
 			HoughTransform.FillAcc(points1, points2, matches);
@@ -177,7 +176,7 @@ namespace csva
 		vector<Mat> transforms;
 		csva::hough_transform(kpts1, kpts2, goodmatches, image1, image2, clusters);
 		int number_of_matches = 0;
-		int max_cluster = 0;
+		size_t max_cluster = 0;
 		for (vector<DMatch> ms : clusters)
 		{
 			number_of_matches += ms.size();
@@ -187,7 +186,7 @@ namespace csva
 			}
 		}
 		csva::verify_clusters(clusters, verified, transforms, kpts1, kpts2, image1, image2);
-		float maxConf = 0.f;
+		double maxConf = 0.;
 		Mat PT;
 		array<double, 6> bestconf;
 
@@ -333,7 +332,7 @@ namespace csva
 			max_cluster_size = mcl_max.matches.size();
 			if (!vote_thresh)
 			{
-				vote_thresh = mcl_max.matches.size() * 0.6;
+				vote_thresh = int(mcl_max.matches.size() * 0.6);
 			}
 			if (vote_thresh < 3)
 			{
@@ -352,7 +351,7 @@ namespace csva
 			Cluster_data mcl_max2 = HoughTransform2.MaxCluster();
 			mcl_max = mcl_max1.matches.size() > mcl_max2.matches.size() ? mcl_max1 : mcl_max2;
 			max_cluster_size = mcl_max.matches.size();
-			int vote_thresh = mcl_max.matches.size() * 0.6;
+			int vote_thresh = int(mcl_max.matches.size() * 0.6);
 			if (vote_thresh < 3)
 			{
 				vote_thresh = 3;
