@@ -2,7 +2,7 @@
 Copyright (C) 2014  Roman Malashin
 Copyright (C) 2018  Roman Malashin
 
-All rights reserved.
+
 
 This is the Author's implementation of CSVA: "Core" structural verification algorithm [1]. There are few differences with the paper. 
 
@@ -79,7 +79,7 @@ Rect getImageProjBbx(Mat image1, Mat trM)
 	pair< iterator, iterator > resultY = boost::minmax_element(yy.begin(), yy.end());
 	double ymin = *resultY.first;
 	double ymax = *resultY.second;
-	return Rect(xmin, ymin, xmax - xmin, ymax - ymin);
+	return Rect(int(xmin), int(ymin), int(xmax - xmin), int(ymax - ymin));
 }
 
 Point2f WrapTransform(Point2f SamplePoint, const Mat& trMatrix)
@@ -94,7 +94,7 @@ Point2f WrapTransform(Point2f SamplePoint, const Mat& trMatrix)
     {
         r = Result.at<double>(2);
     }
-    Point2f np((float)(Result.at<double>(0)) / r, (float)(Result.at<double>(1)) / r);
+    Point2f np((float)(Result.at<double>(0) / r), (float)(Result.at<double>(1) / r));
     return np;
 }
 
@@ -405,11 +405,11 @@ vector<DMatch> excludeMany2OneMatches(const vector<DMatch>& matches, const vecto
 
     DMatch* matches_link = (DMatch*)malloc(sizeof(DMatch) * keypoints2.size());
     vector<DMatch> excluded_matches;
-    for(int i = 0; i < keypoints2.size(); i++)
+    for(size_t i = 0; i < keypoints2.size(); i++)
     {
         ind[i] = -1;
     }
-    for(int i = 0; i < matches.size(); i++)
+    for(size_t i = 0; i < matches.size(); i++)
     {
         int indx1 = matches.at(i).queryIdx;
         int indx2 = matches.at(i).trainIdx;
@@ -429,7 +429,7 @@ vector<DMatch> excludeMany2OneMatches(const vector<DMatch>& matches, const vecto
         }
     }
     vector<DMatch> newmatches;
-    for(int i =0; i < keypoints2.size(); i++)
+    for(size_t i =0; i < keypoints2.size(); i++)
     {
         if(ind[i] > -1)
         {
@@ -446,11 +446,11 @@ vector<DMatch> excludeOne2ManyMatches(const vector<DMatch>& matches, const vecto
     int* ind = (int*)malloc(sizeof(int) * keypoints1.size());
     DMatch* matches_link = (DMatch*)malloc(sizeof(DMatch) * keypoints1.size());
     vector<DMatch> excluded_matches;
-    for(int i = 0; i < keypoints1.size(); i++)
+    for(size_t i = 0; i < keypoints1.size(); i++)
     {
         ind[i] = -1;
     }
-    for(int i = 0; i < matches.size(); i++)
+    for(size_t i = 0; i < matches.size(); i++)
     {
         int indx1 = matches.at(i).queryIdx;
         int indx2 = matches.at(i).trainIdx;
@@ -470,7 +470,7 @@ vector<DMatch> excludeOne2ManyMatches(const vector<DMatch>& matches, const vecto
         }
     }
     vector<DMatch> newmatches;
-    for(int i =0; i < keypoints1.size(); i++)
+    for(size_t i =0; i < keypoints1.size(); i++)
     {
         if(ind[i] > -1)
         {
@@ -484,7 +484,7 @@ vector<DMatch> excludeOne2ManyMatches(const vector<DMatch>& matches, const vecto
 
 int findMatch(const DMatch& m, const vector<DMatch>& allmatches, int crossCheck)
 {
-    for(int i = 0; i < allmatches.size(); i++)
+    for(size_t i = 0; i < allmatches.size(); i++)
     {
         if(crossCheck)
         {
@@ -516,7 +516,7 @@ int findMatch(const DMatch& m, const vector<DMatch>& allmatches, int crossCheck)
 vector<DMatch> useNNratio(const vector<DMatch>& matches, double ratio)
 {
     vector<DMatch> outMatches;
-    for(int i = 0; i < matches.size(); i++)
+    for(size_t i = 0; i < matches.size(); i++)
     {
         DMatch m = matches.at(i);
         if(m.distance < ratio)
@@ -529,25 +529,25 @@ vector<DMatch> useNNratio(const vector<DMatch>& matches, double ratio)
 
 float angleBetweenLines(const Point &v1, const Point &v2)
 {
-	float len1 = sqrt(v1.x * v1.x + v1.y * v1.y);
-	float len2 = sqrt(v2.x * v2.x + v2.y * v2.y);
+	float len1 = float(sqrt(v1.x * v1.x + v1.y * v1.y));
+	float len2 = float(sqrt(v2.x * v2.x + v2.y * v2.y));
 
-	float dot = v1.x * v2.x + v1.y * v2.y;
+	float dot = float(v1.x * v2.x + v1.y * v2.y);
 
 	float a = dot / (len1 * len2);
 
 	if (a >= 1.0)
 		return 0.0;
 	else if (a <= -1.0)
-		return CV_PI;
+		return float(CV_PI);
 	else
 		return acos(a); // 0..PI
 }
 
 double calculateNewImageSquare(const cv::Size& OriginalSize, const Mat& transform)
 {
-	float height = OriginalSize.height;
-	float width = OriginalSize.width;
+	float height =float( OriginalSize.height);
+	float width = float(OriginalSize.width);
 	vector<Point2f> points;
 	points.push_back(Point2f(0, 0));
 	points.push_back(Point2f(width, 0));
@@ -566,8 +566,8 @@ double calculateNewImageSquare(const cv::Size& OriginalSize, const Mat& transfor
 
 vector<Point2f> getNewOutline_of_image(const Mat& image, const Mat& Tr)
 {
-	float height = image.size().height;
-	float width = image.size().width;
+	float height = float(image.size().height);
+	float width = float(image.size().width);
 	vector<Point2f> points;
 	points.push_back(Point2f(0, 0));
 	points.push_back(Point2f(width, 0));

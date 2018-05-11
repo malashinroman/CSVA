@@ -2,7 +2,7 @@
 Copyright (C) 2014  Roman Malashin
 Copyright (C) 2018  Roman Malashin
 
-All rights reserved.
+*
 
 This is the Author's implementation of CSVA: "Core" structural verification algorithm [1]. There are few differences with the paper. 
 
@@ -62,7 +62,7 @@ Hough_Transform::Hough_Transform(double BinOrSize, double BinXSize, double BinYS
 	this->BinOrSize = BinOrSize;
 	this->NumOrBin = (int)(360 / BinOrSize);
 	double maxSize = 32.;
-	this->NumScaleBin = log(maxSize) / log(BinScFactor) * 2 + 1;
+	this->NumScaleBin = int(log(maxSize) / log(BinScFactor) * 2 + 1);
 	this->BinScFactor = BinScFactor;
 	this->BinXSize = BinXSize; //4 - we should have positive and negative position of the model aswell
 	this->BinYSize = BinYSize; // it's not an exact value, we assume square map for the model
@@ -110,7 +110,7 @@ void Hough_Transform::removeSmallClusters(int threshold, bool independent)
 
 void Hough_Transform::ExcludeOne2ManyFromClusters()
 {
-	for (int i = 0; i < this->clusters.size(); i++)
+	for (size_t i = 0; i < this->clusters.size(); i++)
 	{
 		this->clusters.at(i).matches = excludeOne2ManyMatches(this->clusters.at(i).matches, this->keypoints1, this->keypoints2);
 	}
@@ -118,7 +118,7 @@ void Hough_Transform::ExcludeOne2ManyFromClusters()
 
 void Hough_Transform::ExcludeMany2OneFromClusters()
 {
-	for (int i = 0; i < this->clusters.size(); i++)
+	for (size_t i = 0; i < this->clusters.size(); i++)
 	{
 		this->clusters.at(i).matches = excludeMany2OneMatches(this->clusters.at(i).matches, this->keypoints1, this->keypoints2);
 	}
@@ -145,12 +145,12 @@ void Hough_Transform::FillAccNewBoundary2(vector<KeyPoint> points1, vector<KeyPo
 	this->keypoints1 = points1;
 	this->keypoints2 = points2;
 	int numberOfPoint = 0;
-	int i;
+	//int i;
 	double deltaScale = ShiftAcc > 0 ? 0.5 : 0;//this->BinScFactor/2 : 0;
 
 	double deltaOr = ShiftAcc > 0 ? this->BinOrSize / 2 : 0;
 	//printf("Accumulating matches\n");
-	for (i = 0; i < matches.size(); i++)
+	for (size_t i = 0; i < matches.size(); i++)
 	{
 		numberOfPoint++;
 		int indx1 = matches.at(i).queryIdx;
@@ -184,8 +184,8 @@ void Hough_Transform::FillAccNewBoundary2(vector<KeyPoint> points1, vector<KeyPo
 		double mscale = pow(2, bins);
 		//float curBinXsize = this->BinXSize;
 		//float curBinYsize = this->BinYSize;
-		float curBinXsize = this->BinXSize / mscale;
-		float curBinYsize = this->BinYSize / mscale;
+		float curBinXsize = float(this->BinXSize / mscale);
+		float curBinYsize = float(this->BinYSize / mscale);
 
 		double deltaX = ShiftAcc > 0 ? curBinXsize / 2 : 0;
 		double deltaY = ShiftAcc > 0 ? curBinYsize / 2 : 0;
@@ -206,13 +206,13 @@ void Hough_Transform::FillAccNewBoundary(vector<KeyPoint> points1, vector<KeyPoi
 	this->keypoints1 = points1;
 	this->keypoints2 = points2;
 	int numberOfPoint = 0;
-	int i;
+	//int i;
 	double deltaScale = ShiftAcc > 0 ? 0.5 : 0;//this->BinScFactor/2 : 0;
 	double deltaX = ShiftAcc > 0 ? this->BinXSize / 2 : 0;
 	double deltaY = ShiftAcc > 0 ? this->BinYSize / 2 : 0;
 	double deltaOr = ShiftAcc > 0 ? this->BinOrSize / 2 : 0;
 	//printf("Accumulating matches\n");
-	for (i = 0; i < matches.size(); i++)
+	for (size_t i = 0; i < matches.size(); i++)
 	{
 		numberOfPoint++;
 		int indx1 = matches.at(i).queryIdx;
@@ -269,9 +269,9 @@ void Hough_Transform::FillAcc(vector<KeyPoint> points1, vector<KeyPoint> points2
 	vector<DMatch>::iterator it;
 	//Mat imagePosAcc = Mat::zeros(this->image1.size(), CV_8U);
 	int numberOfPoint = 0;
-	int i;
+	//int i;
 	//printf("Accumulating matches\n");
-	for (i = 0; i < matches.size(); i++)
+	for (size_t i = 0; i < matches.size(); i++)
 	{
 		numberOfPoint++;
 
@@ -327,14 +327,9 @@ void Hough_Transform::FillAcc(vector<KeyPoint> points1, vector<KeyPoint> points2
 		double shifty = modelLoc.y;
 
 		double mscale = pow(this->BinScFactor, bins);
-		/*float curBinXsize = this->BinXSize;
-		float curBinYsize = this->BinYSize;*/
 
-		/*float curBinXsize = this->BinXSize / mscale;
-		float curBinYsize = this->BinYSize / mscale;*/
-
-		float curBinXsize = this->BinXSize * mscale;
-		float curBinYsize = this->BinYSize * mscale;
+		float curBinXsize = float(this->BinXSize * mscale);
+		float curBinYsize = float(this->BinYSize * mscale);
 
 		//float curBinXsize = this->BinXSize;
 		//float curBinYsize = this->BinYSize;
@@ -362,8 +357,8 @@ void Hough_Transform::FillAcc(vector<KeyPoint> points1, vector<KeyPoint> points2
 		/*float curBinXsize2 = this->BinXSize / mscale2;
 		float curBinYsize2 = this->BinYSize / mscale2;*/
 
-		float curBinXsize2 = this->BinXSize * mscale2;
-		float curBinYsize2 = this->BinYSize * mscale2;
+		float curBinXsize2 = float(this->BinXSize * mscale2);
+		float curBinYsize2 = float(this->BinYSize * mscale2);
 
 
 		binx_s2 = (int)(shiftx / curBinXsize2); //
@@ -431,7 +426,7 @@ Cluster_data Hough_Transform::MaxCluster()
 		float ScFactor = 1;
 		if (kv.first[3] < 0)
 		{
-			ScFactor = pow(2, -kv.first[3]);
+			ScFactor = float(pow(2, -kv.first[3]));
 		}
 		//!int curvotes = kv.second.size() * ScFactor;
 		int curvotes = kv.second.size();
@@ -526,16 +521,16 @@ void Hough_Transform::UseTransformConstraint(double initPointPercTh, double init
 	int eliminated_num = 0;
 	char key = 'o';
 
-	int nthreads, tid;
+	//int nthreads;
 	int clusters_num = this->clusters.size();
 	vector<Cluster_data> newClusters;
 	vector<DMatch> allfoundMatches;
-	int smallClusterSize = 4;
-	int i = 0;
+	size_t smallClusterSize = 4;
+	//int i = 0;
 #if !defined(_DEBUG) && defined(OMP_OPTIMIZATION)
 #pragma omp parallel for private(i) schedule(guided,1) //shared(newClusters)
 #endif
-	for (i = 0; i < this->clusters.size(); i++)
+	for (size_t i = 0; i < this->clusters.size(); i++)
 	{
 		int numthreads = omp_get_num_threads();
 		int numThread = omp_get_thread_num();
@@ -583,13 +578,13 @@ vector<DMatch> Hough_Transform::UseTransfForCluster(Cluster_data& NewCData, doub
 	double rotaionThresh = InitialRotationThresh;
 	double scaleThresh = InitialScaleThresh;
 	int eliminated = 0;
-	char windowname[200];
+	//char windowname[200];
 
 	vector<DMatch> allEliminatedMatches;
 	double scale1 = 0;
 	double scale2 = 0;
 	double ratio = 0;
-	for (int i = 0; i < NewCData.matches.size(); i++)
+	for (size_t i = 0; i < NewCData.matches.size(); i++)
 	{
 		DMatch m = NewCData.matches.at(i);
 		int indx1 = m.queryIdx;

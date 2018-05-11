@@ -2,7 +2,7 @@
 Copyright (C) 2014  Roman Malashin
 Copyright (C) 2018  Roman Malashin
 
-All rights reserved.
+*
 
 This is the Author's implementation of CSVA: "Core" structural verification algorithm [1]. There are few differences with the paper. 
 
@@ -93,7 +93,7 @@ double calculateConfidenceLowe(Mat im1, Mat im2, const vector<KeyPoint>& kpts1, 
 	//drawQuadrangle(im2, image1corners_, CV_RGB(255, 255, 255));
 	//perspectiveTransform(image1corners, image1corners_, H_);
 	vector<KeyPoint> pointsInPolygon;
-	for (int i = 0; i < keypoints2.size(); i++)
+	for (size_t i = 0; i < keypoints2.size(); i++)
 	{
 		KeyPoint kp = keypoints2.at(i);
 		double in = pointPolygonTest(image1corners_, kp.pt, false);
@@ -127,7 +127,7 @@ vector<double> calculateMatchesQuality(const vector<DMatch>& matches)
 		, 0.081247918, 0.072241266, 0.06388324, 0.056212654, 0.049757048, 0.043965423, 0.03873461, 0.034463823, 0.030507606, 0.026978921, 0.024093657, 0.021463997, 0.019212371
 		, 0.017212054, 0.015478978, 0.013895733, 0.012535471 };
 	double prob_every_mistaked = 1;
-	for (int i = 0; i < matches.size(); i++)
+	for (size_t i = 0; i < matches.size(); i++)
 	{
 		double nn_ratio = matches.at(i).distance;
 		int ind = int(nn_ratio * 100);
@@ -142,7 +142,7 @@ double calculateAverageProbabilityOfMatches(vector<DMatch> matches)
 	vector<double> qualities = calculateMatchesQuality(matches);
 
 	double sum = 0;
-	for (int i = 0; i < qualities.size(); i++)
+	for (size_t i = 0; i < qualities.size(); i++)
 	{
 		sum += qualities.at(i);
 	}
@@ -152,14 +152,14 @@ double calculateAverageProbabilityOfMatches(vector<DMatch> matches)
 double calculateProbOfrandomPickQualityMatches(vector<DMatch> all_matches, vector<DMatch> pickMatches, bool biggerIsGood)
 {
 	double sum = 0;
-	for (int i = 0; i < pickMatches.size(); i++)
+	for (size_t i = 0; i < pickMatches.size(); i++)
 	{
 		sum += pickMatches.at(i).distance;
 	}
 	double average = sum / pickMatches.size();
 	int count_better = 0;
 	int count_worse = 0;
-	for (int i = 0; i < all_matches.size(); i++)
+	for (size_t i = 0; i < all_matches.size(); i++)
 	{
 		double t = all_matches.at(i).distance;
 		if (t > average)

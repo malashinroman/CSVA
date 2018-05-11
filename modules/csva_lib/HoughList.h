@@ -2,7 +2,7 @@
 Copyright (C) 2014  Roman Malashin
 Copyright (C) 2018  Roman Malashin
 
-All rights reserved.
+
 
 This is the Author's implementation of CSVA: "Core" structural verification algorithm [1]. There are few differences with the paper. 
 

@@ -2,7 +2,7 @@
 Copyright (C) 2014  Roman Malashin
 Copyright (C) 2018  Roman Malashin
 
-All rights reserved.
+*
 
 This is the Author's implementation of CSVA: "Core" structural verification algorithm [1]. There are few differences with the paper. 
 
@@ -171,7 +171,7 @@ namespace csva
 	{
 		vector<DMatch> goodmatches;
 		
-		csva::primary_filtering(kpts1, kpts2, matches, 0.98, goodmatches);
+		csva::primary_filtering(kpts1, kpts2, matches, 0.98f, goodmatches);
 		vector<vector<DMatch> > clusters, verified;
 		vector<Mat> transforms;
 		csva::hough_transform(kpts1, kpts2, goodmatches, image1, image2, clusters);
@@ -193,7 +193,7 @@ namespace csva
 		/*
 		select the best solution
 		*/
-		for (int i = 0; i < verified.size(); i++)
+		for (size_t i = 0; i < verified.size(); i++)
 		{
 			Mat tr = transforms.at(i);
 			vector<DMatch>& ms = verified.at(i);
@@ -244,12 +244,12 @@ namespace csva
 
 		csva::primary_filtering(kpts1, kpts2, matches, 1, goodmatches);
 		vector< vector<DMatch> > clusters;
-		int demanded_size_of_cluster = goodmatches.size() / 100;
+		size_t demanded_size_of_cluster = goodmatches.size() / 100;
 		demanded_size_of_cluster = demanded_size_of_cluster < 3 ? 4 : demanded_size_of_cluster < 5 ? 5 : demanded_size_of_cluster;
 		csva::hough_transform(kpts1, kpts2, goodmatches, image1, image2, clusters, demanded_size_of_cluster);
 		//matchesHoughConstraint(image1, image2, &result, kpts1, kpts2, goodmatches, 0, 0);
 		vector<DMatch> allfoundMatches;
-		for (int i = 0; i < clusters.size(); i++)
+		for (size_t i = 0; i < clusters.size(); i++)
 		{
 			
 			vector<DMatch> cluster_matches = clusters.at(i);
@@ -372,7 +372,7 @@ namespace csva
 		vector<Mat>& transforms, const vector<KeyPoint>& kpts1, 
 		const vector<KeyPoint>& kpts2, const Mat& image1, const Mat& image2)
 	{
-		for (int i = 0; i < clusters.size(); i++)
+		for (size_t i = 0; i < clusters.size(); i++)
 		{
 			Mat trM_;
 			vector<DMatch> matches = clusters.at(i);

@@ -2,7 +2,7 @@
 Copyright (C) 2014  Roman Malashin
 Copyright (C) 2018  Roman Malashin
 
-All rights reserved.
+
 
 This is the Author's implementation of CSVA: "Core" structural verification algorithm [1]. There are few differences with the paper. 
 
@@ -272,7 +272,7 @@ Mat Cluster_data::fitModelParamsSimilarityRansac(const vector<KeyPoint>& keypoin
 		double scRatio1 = S > mscale1 ? S / mscale1 : mscale1 / S;
 		double scRatio2 = S > mscale2 ? S / mscale2 : mscale2 / S;
 
-		Point2f modelPoint = Point2f(image1.size().width / 2, image1.size().height / 2);
+		Point2f modelPoint = Point2f(float(image1.size().width) / 2.f, float(image1.size().height) / 2.f);
 		Point2f modelp1 = predictModelPosition(kp11, kp21, modelPoint);
 		Point2f modelp2 = predictModelPosition(kp12, kp22, modelPoint);
 		double dist = euclideanDistacne(modelp1, modelp2);
@@ -317,7 +317,7 @@ Mat Cluster_data::fitModelParamsSimilarityRansac(const vector<KeyPoint>& keypoin
 		transfMat.at<double>(0, 2) = tx;
 		transfMat.at<double>(1, 2) = ty;
 
-		for(int j = 0; j < kpts1.size(); j++)
+		for(size_t j = 0; j < kpts1.size(); j++)
 		{
 			KeyPoint kp1 = kpts1.at(j);
 			KeyPoint kp2 = kpts2.at(j);
@@ -328,7 +328,7 @@ Mat Cluster_data::fitModelParamsSimilarityRansac(const vector<KeyPoint>& keypoin
 			p.at<double>(2) = 1.;
 
 			Mat p_ = transfMat*p;
-			Point2f pointProj = Point2f(p_.at<double>(0), p_.at<double>(1));
+			Point2f pointProj = Point2f(float(p_.at<double>(0)), float(p_.at<double>(1)));
 			double dist = euclideanDistacne(pointProj, kp2.pt);
 
 			double mangle1 = getMutualAngle(kp1, kp2);
@@ -483,7 +483,7 @@ Mat Cluster_data::fitModelParams(const vector<KeyPoint>& keypoints1, const vecto
 		vector<Point2f> points2D2;
 		Mat P1 = Mat(2, this->matches.size(), CV_64F, 0.);
 		Mat P2 = Mat(2, this->matches.size(), CV_64F, 0.);
-		for(int i = 0; i < kpts1.size(); i++)
+		for(size_t i = 0; i < kpts1.size(); i++)
 		{
 			P1.at<double>(0,i) = kpts1.at(i).pt.x;
 			P1.at<double>(1,i) = kpts1.at(i).pt.y;
@@ -503,7 +503,7 @@ Mat Cluster_data::fitModelParams(const vector<KeyPoint>& keypoints1, const vecto
 		vector<Point2f> points2D2;
 		Mat P1 = Mat(this->matches.size(), 2, CV_64F, 0.);
 		Mat P2 = Mat(this->matches.size(), 2, CV_64F, 0.);
-		for(int i = 0; i < kpts1.size(); i++)
+		for(size_t i = 0; i < kpts1.size(); i++)
 		{
 			P1.at<double>(i,0) = kpts1.at(i).pt.x;
 			P1.at<double>(i,1) = kpts1.at(i).pt.y;
@@ -645,11 +645,11 @@ Mat Cluster_data::fitModelParams(const vector<KeyPoint>& keypoints1, const vecto
 				continue;
 			}
 
-			Point2f modelPoint = Point2f(image1.size().width /2, image1.size().height / 2);
+			Point2f modelPoint = Point2f(image1.size().width / 2.f, image1.size().height / 2.f);
 			Point2f modelp1 = predictModelPosition(kp11, kp21, modelPoint);
 			Point2f modelp2 = predictModelPosition(kp12, kp22, modelPoint);
 			double dist = euclideanDistacne(modelp1, modelp2);
-			int maxres = 0.8 * sqrt(1.*image2.size().width*image2.size().width + image2.size().height*image2.size().height);
+			int maxres = int(0.8 * sqrt(1.*image2.size().width*image2.size().width + image2.size().height*image2.size().height));
 			double distThresh = maxres / 8;
 			if(dist > distThresh)
 			{
@@ -672,7 +672,7 @@ Mat Cluster_data::fitModelParams(const vector<KeyPoint>& keypoints1, const vecto
 			transfMat.at<double>(1,2) = ty;
 
 			vector<DMatch> goodmatches;
-			for(int j = 0; j < kpts1.size(); j++)
+			for(size_t j = 0; j < kpts1.size(); j++)
 			{
 
 				Mat p(3,1, CV_64F);
@@ -680,7 +680,7 @@ Mat Cluster_data::fitModelParams(const vector<KeyPoint>& keypoints1, const vecto
 				p.at<double>(1) = kpts1.at(j).pt.y;
 				p.at<double>(2) = 1;
 				Mat p_ = transfMat*p;
-				Point2f pointProj = Point2f(p_.at<double>(0), p_.at<double>(1));
+				Point2f pointProj = Point2f(float(p_.at<double>(0)), float(p_.at<double>(1)));
 				double dist = euclideanDistacne(pointProj, kpts2.at(j).pt);
 
 				if(dist < inlier_dist)
@@ -743,7 +743,7 @@ Mat Cluster_data::fitModelParams(const vector<KeyPoint>& keypoints1, const vecto
 		vector<Point2f> points2D2;
 		Mat P1 = Mat(this->matches.size(), 2, CV_64F, 0.);
 		Mat P2 = Mat(this->matches.size(), 2, CV_64F, 0.);
-		for(int i = 0; i < kpts1.size(); i++)
+		for(size_t i = 0; i < kpts1.size(); i++)
 		{
 			P1.at<double>(i,0) = kpts1.at(i).pt.x;
 			P1.at<double>(i,1) = kpts1.at(i).pt.y;
@@ -776,7 +776,7 @@ Mat Cluster_data::fitModelParams(const vector<KeyPoint>& keypoints1, const vecto
 		vector<Point2f> points2D2;
 		Mat P1 = Mat(this->matches.size(), 2, CV_64F, 0.);
 		Mat P2 = Mat(this->matches.size(), 2, CV_64F, 0.);
-		for(int i = 0; i < kpts1.size(); i++)
+		for(size_t i = 0; i < kpts1.size(); i++)
 		{
 			P1.at<double>(i,0) = kpts1.at(i).pt.x;
 			P1.at<double>(i,1) = kpts1.at(i).pt.y;
@@ -816,7 +816,7 @@ Mat Cluster_data::fitModelParams(const vector<KeyPoint>& keypoints1, const vecto
 vector<DMatch> invertMatches(vector<DMatch> matches)
 {
 	vector<DMatch> invMatches;
-	for(int i = 0; i < matches.size(); i++)
+	for(size_t i = 0; i < matches.size(); i++)
 	{
 		DMatch m = matches.at(i);
 		DMatch im;
