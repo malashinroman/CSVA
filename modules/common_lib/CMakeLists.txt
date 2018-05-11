@@ -1,6 +1,6 @@
 PROJECT( common_lib )
 cmake_minimum_required (VERSION 2.6)
-FIND_PACKAGE(OpenCV 3.1 REQUIRED core imgproc highgui features2d xfeatures2d ml video shape stitching calib3d)
+FIND_PACKAGE(OpenCV 3.1 REQUIRED core imgproc highgui features2d xfeatures2d ml video shape calib3d)
 
 if (UNIX)
 	find_package(Boost REQUIRED COMPONENTS filesystem)
@@ -17,6 +17,10 @@ if (WIN32)
 endif (WIN32)
 
 add_compile_options(-std=c++11)
+if (UNIX)
+   add_compile_options(-fPIC)
+endif (UNIX)
+
 include_directories(${OpenCV_INCLUDE_DIRS})
 ADD_LIBRARY(common_lib  feature_extractors.h feature_extractors.cpp)
 TARGET_LINK_LIBRARIES(common_lib  ${Boost_LIBRARIES} ${OpenCV_LIBS})

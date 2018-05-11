@@ -5,7 +5,7 @@ if(WIN32)
 elseif(UNIX)
   list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake_lin")
 endif()
-FIND_PACKAGE(OpenCV 3.1 REQUIRED core imgproc highgui features2d xfeatures2d ml video shape stitching calib3d)
+FIND_PACKAGE(OpenCV 3.1 REQUIRED core imgproc highgui features2d xfeatures2d ml video shape calib3d)
 
 if (UNIX)
 	find_package(Boost REQUIRED COMPONENTS filesystem)
@@ -20,6 +20,23 @@ if (WIN32)
 	message(${Boost_LIBRARY_DIR})
 endif (WIN32)
 
+if (UNIX)
+   add_compile_options(-fext-numeric-literals)
+   add_compile_options(-fopenmp)
+   find_package(OpenMP)
+   #message(${OpenMP_CXX_LIBRARIES})
+endif (UNIX)
+
+
+
+#if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+#  add_compile_options(-fopenmp)
+#else ()
+#  #add_compile_options(-openmp)
+#endif()
+
+
+
 add_compile_options(-std=c++11)
 include_directories(${OpenCV_INCLUDE_DIRS})
 
@@ -30,6 +47,6 @@ confidence_estimation.h
 confidence_estimation.cpp
 )
 
-TARGET_LINK_LIBRARIES(csva_lib  ${Boost_LIBRARIES} ${OpenCV_LIBS})
+TARGET_LINK_LIBRARIES(csva_lib ${Boost_LIBRARIES} ${OpenCV_LIBS})
 #set(${PROJECT_NAME}_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/include
 #   				`CACHE INTERNAL "${PROJECT_NAME}: Include Directories" FORCE)

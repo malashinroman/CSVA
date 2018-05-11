@@ -32,11 +32,11 @@ Permission is hereby granted, free of charge, to any person obtaining
 #include "Cluster_data.h"
 #include "misc_functions.h"
 
-#ifndef WIN32
+/*#ifndef WIN32
 #include <opencv2/videostab/videostab.hpp>
 #else
 #include <opencv2/videostab.hpp> // windows
-#endif
+#endif*/
 #include "matching_hough.h"
 #include <unordered_set>
 #include <opencv2/calib3d/calib3d.hpp>
