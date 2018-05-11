@@ -4,7 +4,7 @@ Copyright (C) 2018  Roman Malashin
 
 All rights reserved.
 
-This is the Author's implementation of CSVA: "Core" structural verification algorithm [1]. Few unpublished modifications extensions are provided.
+This is the Author's implementation of CSVA: "Core" structural verification algorithm [1]. There are few differences with the paper. 
 
 [1] Malashin R.O. Core algorithm for structural verification of keypoint matches. Intelligent Systems Reference Library. Computer Vision in Control Systems-3. 2018. P. 251-286
 
