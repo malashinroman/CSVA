@@ -44,7 +44,7 @@ Permission is hereby granted, free of charge, to any person obtaining
 #include <boost/filesystem.hpp>
 using namespace std;
 using namespace cv;
-#define SAVE_JPG_QUALITY 60
+#define SAVE_JPG_QUALITY 100
 
 int makeDirectory(string folder)
 {
@@ -130,14 +130,18 @@ Mat mergeImages(Mat img1, Mat img2, int topdown)
 }
 int main (int argc, char* argv[])
 {
-	if (argc < 3)
+	if (argc < 4)
 	{
-		cout << "match_aero image1 image2 " << endl;
+		cout << "match_aero image1 image2 type /*type = 1 -fast, type = 2 - robust*/" << endl;
 		return -1;
 	}
 	Mat im1 = imread(argv[1]);
 	Mat im2 = imread(argv[2]);
-
+	int type = 352;
+	if (atoi(argv[3]) == 2)
+	{
+		type = 212;
+	}
 	assert(!im1.empty());
 	assert(!im2.empty());
 	vector<KeyPoint> kpts1;
@@ -179,13 +183,13 @@ int main (int argc, char* argv[])
 	vector<DMatch> inliers;
 	double confide[6];
 	
-	Mat PT = csva::filter_matches(kpts1, kpts2, matches, image1, image2, 1, 352, inliers, confide, 0.01);
+	Mat PT = csva::filter_matches(kpts1, kpts2, matches, image1, image2, 0, 352, inliers, confide, 0.01);
 	
 	Mat res = printMatches(kpts1, kpts2, inliers, image1, image2, cv::DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS | cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
 	
 	boost::filesystem::path p(argv[1]);
 
-	string resultFolder = "tmp/" + p.filename().string()+"_res";
+	string resultFolder = p.filename().string()+"_res";
 	makeDirectory(resultFolder);
 	imwrite(resultFolder + "/matches.jpg", res);
 	Mat result;

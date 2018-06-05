@@ -300,7 +300,7 @@ namespace csva
 		else
 		{
 			csva_filtering_3D(kpts1, kpts2, matches, im1, im2, type, inliers, confidence, LoweProb);
-			return cv::Mat::eye(4, 4, CV_32F);
+			return cv::Mat::eye(3, 3, CV_32F);
 		}
 	}
 	
