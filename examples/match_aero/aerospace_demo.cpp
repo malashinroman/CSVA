@@ -32,7 +32,7 @@ Permission is hereby granted, free of charge, to any person obtaining
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+#include <time.h>
 #include <opencv2/core.hpp>
 
 #include <iostream>
@@ -41,15 +41,17 @@ Permission is hereby granted, free of charge, to any person obtaining
 #include <opencv2/calib3d/calib3d.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui.hpp>
-#include <boost/filesystem.hpp>
+//#include <boost/filesystem.hpp>
+#include <set>
 using namespace std;
 using namespace cv;
 #define SAVE_JPG_QUALITY 100
-
+#include <direct.h>
 int makeDirectory(string folder)
 {
-	//alternative is	mkdir(folder.c_str());
-	boost::filesystem::create_directory(folder);
+	//alternative is	
+	mkdir(folder.c_str());
+	//boost::filesystem::create_directory(folder);
 
 //#ifdef WIN32
 //	mkdir(folder.c_str());
@@ -58,6 +60,7 @@ int makeDirectory(string folder)
 //#endif
 	return 0;
 }
+
 Mat printMatches(vector<KeyPoint> pts1, vector<KeyPoint> pts2, vector<DMatch> matches, Mat image1, Mat image2, int flags)
 {
 	Mat outImage;
@@ -128,20 +131,74 @@ Mat mergeImages(Mat img1, Mat img2, int topdown)
 		return outImage;
 	}
 }
+std::vector<std::string> splitpath(
+	const std::string& str
+	, const std::set<char> delimiters)
+{
+	std::vector<std::string> result;
+
+	char const* pch = str.c_str();
+	char const* start = pch;
+	for (; *pch; ++pch)
+	{
+		if (delimiters.find(*pch) != delimiters.end())
+		{
+			if (start != pch)
+			{
+				std::string str(start, pch);
+				result.push_back(str);
+			}
+			else
+			{
+				result.push_back("");
+			}
+			start = pch + 1;
+		}
+	}
+	result.push_back(start);
+
+	return result;
+}
+
+
 int main (int argc, char* argv[])
 {
-	if (argc < 4)
+	if (argc < 6)
 	{
-		cout << "match_aero image1 image2 type /*type = 1 -fast, type = 2 - robust*/" << endl;
+		cout << "match_aero image1 image2 scale1 scale2 type /*type = 1 -fast, type = 2 - robust*/" << endl;
 		return -1;
 	}
 	Mat im1 = imread(argv[1]);
 	Mat im2 = imread(argv[2]);
+	float scale1 = atof(argv[3]);
+	float scale2 = atof(argv[4]);
+
 	int type = 352;
-	if (atoi(argv[3]) == 2)
+	if (atoi(argv[5]) == 2)
 	{
+		cout<<"robust regime" <<endl;
 		type = 212;
 	}
+	else if(atoi(argv[5]) == 1)
+	{
+		cout << "fast regime" <<endl;
+		type = 352;
+	}
+	else if (atoi(argv[3]) > 100)
+	{
+		type = atoi(argv[3]);
+	}
+	else
+	{
+		cout << "unknown regime" <<endl;
+		return 0;
+	}
+
+	cout << "image 1: " << argv[1] << endl;
+	cout << "image 2: " << argv[2] << endl;
+	cout << "scale coeff 1: " << scale1 << endl;
+	cout << "scale coeff 2: " << scale2 << endl;
+
 	assert(!im1.empty());
 	assert(!im2.empty());
 	vector<KeyPoint> kpts1;
@@ -149,6 +206,8 @@ int main (int argc, char* argv[])
 	int dettime, desctime, mtime;
 	Mat image1, image2, image1c, image2c;
 
+	resize(im1, im1, Size(), scale1, scale1);
+	resize(im2, im2, Size(), scale2, scale2);
 	if (im1.channels() == 3)
 	{
 		cvtColor(im1, image1, CV_BGR2GRAY);
@@ -172,7 +231,7 @@ int main (int argc, char* argv[])
 	}
 
 	OpenCVfeatures feat;
-	vector<DMatch> matches = feat.getLocalPatchMatches2(image1, image2, kpts1, kpts2, 352, &dettime, &desctime, &mtime, 0);
+	vector<DMatch> matches = feat.getLocalPatchMatches2(image1, image2, kpts1, kpts2, type, &dettime, &desctime, &mtime, 1);
 	
 	
 	Mat image1_proj, image1_projc;
@@ -182,14 +241,15 @@ int main (int argc, char* argv[])
 	//char* res_file_name = "shalalla.jpg";
 	vector<DMatch> inliers;
 	double confide[6];
-	
+	cout << "number of generated matches: " << matches.size() << endl;
+	clock_t start = clock();
 	Mat PT = csva::filter_matches(kpts1, kpts2, matches, image1, image2, 0, 352, inliers, confide, 0.01);
-	
+	printf("CSVA time = %f s\n", ((float)(clock())-start) / CLOCKS_PER_SEC); start = clock(); 
 	Mat res = printMatches(kpts1, kpts2, inliers, image1, image2, cv::DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS | cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
 	
-	boost::filesystem::path p(argv[1]);
-
-	string resultFolder = p.filename().string()+"_res";
+	std::set<char> delims{ '\\', '/' };
+	std::vector<std::string> path = splitpath(argv[1], delims);
+	string resultFolder = path.back();
 	makeDirectory(resultFolder);
 	imwrite(resultFolder + "/matches.jpg", res);
 	Mat result;
@@ -228,6 +288,7 @@ int main (int argc, char* argv[])
 		imwrite(resultFolder + "/obj.jpg", image1c, compression_params);
 		imwrite(resultFolder + "/scene.jpg", image2c, compression_params);
 		imwrite(resultFolder + "/transf_obj.jpg", image1_projc, compression_params);
+		cout << "confidence: " << confide[0] <<endl;
 	}
 	else
 	{

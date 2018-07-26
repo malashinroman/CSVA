@@ -573,22 +573,24 @@ vector<DMatch> OpenCVfeatures::getLocalPatchMatches2(Mat image1, Mat image2, vec
 	int type, int* detectionTime, int* descriptionTime, int* matchingTime, int ConsoleOutput)
 {
     Mat descriptors_1, descriptors_2;
+    clock_t start = clock();
     points1 = getKeyPoints(image1, type, ConsoleOutput);
-    points2 = getKeyPoints(image2, type, ConsoleOutput);
-    if(ConsoleOutput)
-    {
-        printf("detection time = %d ms\n", *detectionTime);
-    }
-    descriptors_1 = getDescriptors(image1, points1, type, ConsoleOutput);
-    descriptors_2 = getDescriptors(image2, points2, type, ConsoleOutput);
-    vector<DMatch> matches;
     
+    if(ConsoleOutput) printf("detection 1st image = %f s\n", ((float)(clock())-start) / CLOCKS_PER_SEC); start = clock(); 
+    points2 = getKeyPoints(image2, type, ConsoleOutput);
+    if(ConsoleOutput) printf("detection 2nd image = %f s\n", ((float)(clock())-start) / CLOCKS_PER_SEC); start = clock();
+    descriptors_1 = getDescriptors(image1, points1, type, ConsoleOutput);
+    if(ConsoleOutput) printf("description 1st image = %f s\n", ((float)(clock())-start) / CLOCKS_PER_SEC); start = clock(); 
+    descriptors_2 = getDescriptors(image2, points2, type, ConsoleOutput);
+    if(ConsoleOutput) printf("description 2nd image = %f s\n", ((float)(clock())-start) / CLOCKS_PER_SEC); start = clock();
+    vector<DMatch> matches;
     if ((descriptors_1.size().height == 0) || descriptors_2.size().height == 0)
     {
     }
     else
     {
         matches = getMatches(descriptors_1, descriptors_2, type, ConsoleOutput);
+	if(ConsoleOutput) printf("matching time = %f s\n", ((float)(clock())-start) / CLOCKS_PER_SEC); start = clock();
     }
     return matches;
 }

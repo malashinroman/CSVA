@@ -38,6 +38,7 @@ using namespace std;
 #include "confidence_estimation.h"
 #include "opencv2/imgproc.hpp"
 #include "opencv2/highgui.hpp"
+#include <time.h>
 
 namespace csva
 {
@@ -170,11 +171,13 @@ namespace csva
 	cv::Mat csva_filtering_aero(const vector<KeyPoint>& kpts1, const vector<KeyPoint>& kpts2, const vector<DMatch>& matches, const Mat& image1, const Mat& image2, int type, vector<DMatch>& inliers, double* confidence, double LoweProb)
 	{
 		vector<DMatch> goodmatches;
-		
+		clock_t start = clock();
 		csva::primary_filtering(kpts1, kpts2, matches, 0.98f, goodmatches);
+		printf("primary_filtering = %f s\n", ((float)(clock())-start) / CLOCKS_PER_SEC); start = clock(); 
 		vector<vector<DMatch> > clusters, verified;
 		vector<Mat> transforms;
 		csva::hough_transform(kpts1, kpts2, goodmatches, image1, image2, clusters);
+		printf("hough_transform = %f s\n", ((float)(clock())-start) / CLOCKS_PER_SEC); start = clock();
 		int number_of_matches = 0;
 		size_t max_cluster = 0;
 		for (vector<DMatch> ms : clusters)
@@ -186,6 +189,7 @@ namespace csva
 			}
 		}
 		csva::verify_clusters(clusters, verified, transforms, kpts1, kpts2, image1, image2);
+		printf("verify_clusters = %f s\n", ((float)(clock())-start) / CLOCKS_PER_SEC); start = clock();
 		double maxConf = 0.;
 		Mat PT;
 		array<double, 6> bestconf;
@@ -209,7 +213,7 @@ namespace csva
 				}
 			}
 		}
-
+		printf("findt the best solution = %f s\n", ((float)(clock())-start) / CLOCKS_PER_SEC); start = clock();
 		for (int k = 0; k < 6; k++)
 		{
 			confidence[k] = bestconf[k];

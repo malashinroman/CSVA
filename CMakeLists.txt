@@ -2,6 +2,8 @@ project(csva)
 include("${PROJECT_SOURCE_DIR}/cmake/macro.cmake")
 include_directories(${PROJECT_SOURCE_DIR}/modules)
 
+
+
 if (CMAKE_COMPILER_IS_GNUCXX)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=c++14 -g -fPIC -fext-numeric-literals" CACHE STRING COMPILE_FLAGS FORCE)
     set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -Wall -g -fPIC" CACHE STRING COMPILE_FLAGS FORCE)
@@ -11,8 +13,9 @@ if (CMAKE_COMPILER_IS_GNUCXX)
 
 elseif (MSVC)
 
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Ox /Ob2 /Oi /Ot /arch:AVX /fp:fast /EHsc /W4" CACHE STRING COMPILE_FLAGS FORCE)
-
+	
     ADD_DEFINITIONS(
         -D_USE_MATH_DEFINES
         -DNOMINMAX
