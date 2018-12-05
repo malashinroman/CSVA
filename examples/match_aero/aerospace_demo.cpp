@@ -165,7 +165,14 @@ int main (int argc, char* argv[])
 {
 	if (argc < 6)
 	{
-		cout << "match_aero image1 image2 scale1 scale2 type /*type = 1 -fast, type = 2 - robust*/" << endl;
+		cout << "match_aero image1 image2 scale1 scale2 type \n" <<
+			"image1: object photo" << endl <<
+			"image1: plan photo" << endl <<
+			"scale1: coeff to resize image1" << endl <<
+			"scale2: coeff to resize image2" << endl <<
+			"type: 1 or 2 (1 for fast, 2 - robust)" << endl <<
+			"example: match_aero im1.jpg im2.jpg 0.5 0.5 1" <<
+			endl;
 		return -1;
 	}
 	Mat im1_ = imread(argv[1]);
