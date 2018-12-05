@@ -293,8 +293,8 @@ namespace csva
 	}
 	
 	CSVA_LIB_API cv::Mat filter_matches(const vector<KeyPoint>& kpts1, const vector<KeyPoint>& kpts2, const vector<DMatch>& matches,
-		const Mat& im1, const  Mat& im2,  int mode,
-		int type, vector<DMatch> &inliers, 
+		const Mat& im1, const  Mat& im2, geometry_mode mode,
+		int type, vector<DMatch> &inliers,
 		double* confidence, double LoweProb)
 	{
 		if (mode == 0)

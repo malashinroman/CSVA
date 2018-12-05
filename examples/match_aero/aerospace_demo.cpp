@@ -250,7 +250,7 @@ int main (int argc, char* argv[])
 
 
 	OpenCVfeatures feat;
-	vector<DMatch> matches = feat.getLocalPatchMatches2(image1_process, image2_process, kpts1, kpts2, type, &dettime, &desctime, &mtime, 1);
+	vector<DMatch> matches = feat.getLocalPatchMatches2(image1_process, image2_process, kpts1, kpts2, type, 1);
 	
 	Mat image1_proj, image1_projc;
 	Mat outim;
@@ -266,7 +266,7 @@ int main (int argc, char* argv[])
 	clahe->apply(image1, image1);
 	clahe->apply(image2, image2);
 
-	Mat PT = csva::filter_matches(kpts1, kpts2, matches, image1_process, image2_process, 0, 352, inliers, confide, 0.01);
+	Mat PT = csva::filter_matches(kpts1, kpts2, matches, image1_process, image2_process, csva::geometry_mode::AEROSPACE, 352, inliers, confide, 0.01);
 	printf("CSVA time = %f s\n", ((float)(clock())-start) / CLOCKS_PER_SEC); start = clock(); 
 	Mat res = printMatches(kpts1, kpts2, inliers, image2_process, image2_process, cv::DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS | cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
 	

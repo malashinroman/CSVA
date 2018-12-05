@@ -13,7 +13,7 @@
 #include "feature_extractors.h"
 
 using namespace cv;
-
+using namespace std;
 using namespace cv::xfeatures2d;
 
 int findMatch(DMatch m, vector<DMatch> allmatches, int crossCheck)
@@ -569,8 +569,8 @@ OpenCVfeatures::~OpenCVfeatures()
 {
 	this->releaseDetectorDescriptors();
 }
-vector<DMatch> OpenCVfeatures::getLocalPatchMatches2(Mat image1, Mat image2, vector<KeyPoint>& points1, vector<KeyPoint>& points2, 
-	int type, int* detectionTime, int* descriptionTime, int* matchingTime, int ConsoleOutput)
+vector<DMatch> OpenCVfeatures::getLocalPatchMatches2(Mat image1, Mat image2, vector<KeyPoint>& points1, vector<KeyPoint>& points2,
+	int type, int ConsoleOutput)
 {
     Mat descriptors_1, descriptors_2;
     clock_t start = clock();

@@ -58,11 +58,11 @@ vector<DMatch> call3D(char* image1_path, char* image2_path, Mat* matchresult, ve
 	clock_t finish = clock();
 	int t1 = (finish - start) * 1000 / CLOCKS_PER_SEC;
 	int tmp1, tmp2, tmp3;
-	std::vector<DMatch> matches = feat.getLocalPatchMatches2(image1, image2, points1, points2, LocalMatchtype, &tmp1, &tmp2, &tmp3, 0);
+	std::vector<DMatch> matches = feat.getLocalPatchMatches2(image1, image2, points1, points2, LocalMatchtype, 0);
 	clock_t chp = clock();
 	int t2 = (chp - finish) * 1000 / CLOCKS_PER_SEC;
 	vector<DMatch> goodmatches;
 	double confidence[6];
-	csva::filter_matches(points1, points2, matches, image1, image2, 1, LocalMatchtype, goodmatches, confidence, 0.001);
+	csva::filter_matches(points1, points2, matches, image1, image2, csva::geometry_mode::THREEDIM_SCENE, LocalMatchtype, goodmatches, confidence, 0.001);
 	return goodmatches;
 }
