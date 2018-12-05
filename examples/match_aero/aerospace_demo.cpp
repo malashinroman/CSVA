@@ -168,8 +168,8 @@ int main (int argc, char* argv[])
 		cout << "match_aero image1 image2 scale1 scale2 type /*type = 1 -fast, type = 2 - robust*/" << endl;
 		return -1;
 	}
-	Mat im1 = imread(argv[1]);
-	Mat im2 = imread(argv[2]);
+	Mat im1_ = imread(argv[1]);
+	Mat im2_ = imread(argv[2]);
 	float scale1 = atof(argv[3]);
 	float scale2 = atof(argv[4]);
 
@@ -184,9 +184,9 @@ int main (int argc, char* argv[])
 		cout << "fast regime" <<endl;
 		type = 352;
 	}
-	else if (atoi(argv[3]) > 100)
+	else if (atoi(argv[5]) > 100)
 	{
-		type = atoi(argv[3]);
+		type = atoi(argv[5]);
 	}
 	else
 	{
@@ -199,40 +199,51 @@ int main (int argc, char* argv[])
 	cout << "scale coeff 1: " << scale1 << endl;
 	cout << "scale coeff 2: " << scale2 << endl;
 
-	assert(!im1.empty());
-	assert(!im2.empty());
+	assert(!im1_.empty());
+	assert(!im2_.empty());
 	vector<KeyPoint> kpts1;
 	vector<KeyPoint> kpts2;
 	int dettime, desctime, mtime;
-	Mat image1, image2, image1c, image2c;
+	Mat image1, image2, image1c, image2c, image1_process, image2_process;
+	Mat im1, im2;
 
-	resize(im1, im1, Size(), scale1, scale1);
-	resize(im2, im2, Size(), scale2, scale2);
-	if (im1.channels() == 3)
+
+
+	if (im1_.channels() == 3)
 	{
-		cvtColor(im1, image1, CV_BGR2GRAY);
-		image1c = im1.clone();
+		cvtColor(im1_, image1, CV_BGR2GRAY);
+		image1c = im1_.clone();
 	}
 	else
 	{
-		image1 = im1.clone();
-		cvtColor(im1, image1c, CV_GRAY2BGR);
+		image1 = im1_.clone();
+		cvtColor(im1_, image1c, CV_GRAY2BGR);
 	}
 
-	if (im2.channels() == 3)
+	if (im2_.channels() == 3)
 	{
-		cvtColor(im2, image2, CV_BGR2GRAY);
-		image2c = im2.clone();
+		cvtColor(im2_, image2, CV_BGR2GRAY);
+		image2c = im2_.clone();
 	}
 	else
 	{
-		image2 = im2.clone();
-		cvtColor(im2, image2c, CV_GRAY2BGR);
+		image2 = im2_.clone();
+		cvtColor(im2_, image2c, CV_GRAY2BGR);
 	}
+
+	resize(image1, image1_process, Size(), scale1, scale1);
+	resize(image2, image2_process, Size(), scale2, scale2);
+	//double scalef = scale2 / scale1;
+
+	Mat preT1, preT2;
+	double tmp[9] = { scale1, 0, 0, 0, scale1, 0, 0, 0, 1 };
+	Mat(3, 3, CV_64F, tmp).copyTo(preT1);
+	double tmp2[9] = { scale2, 0, 0, 0, scale2, 0, 0, 0, 1 };
+	Mat(3, 3, CV_64F, tmp2).copyTo(preT2);
+
 
 	OpenCVfeatures feat;
-	vector<DMatch> matches = feat.getLocalPatchMatches2(image1, image2, kpts1, kpts2, type, &dettime, &desctime, &mtime, 1);
-	
+	vector<DMatch> matches = feat.getLocalPatchMatches2(image1_process, image2_process, kpts1, kpts2, type, &dettime, &desctime, &mtime, 1);
 	
 	Mat image1_proj, image1_projc;
 	Mat outim;
@@ -243,9 +254,14 @@ int main (int argc, char* argv[])
 	double confide[6];
 	cout << "number of generated matches: " << matches.size() << endl;
 	clock_t start = clock();
-	Mat PT = csva::filter_matches(kpts1, kpts2, matches, image1, image2, 0, 352, inliers, confide, 0.01);
+	cv::Ptr<cv::CLAHE> clahe = cv::createCLAHE();
+	clahe->setClipLimit(4);
+	clahe->apply(image1, image1);
+	clahe->apply(image2, image2);
+
+	Mat PT = csva::filter_matches(kpts1, kpts2, matches, image1_process, image2_process, 0, 352, inliers, confide, 0.01);
 	printf("CSVA time = %f s\n", ((float)(clock())-start) / CLOCKS_PER_SEC); start = clock(); 
-	Mat res = printMatches(kpts1, kpts2, inliers, image1, image2, cv::DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS | cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
+	Mat res = printMatches(kpts1, kpts2, inliers, image2_process, image2_process, cv::DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS | cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
 	
 	std::set<char> delims{ '\\', '/' };
 	std::vector<std::string> path = splitpath(argv[1], delims);
@@ -255,6 +271,8 @@ int main (int argc, char* argv[])
 	Mat result;
 	if (!PT.empty())
 	{
+		//we will aply transformation to the images of the original size
+		PT = preT2.inv() * PT * preT1;
 		cv::warpPerspective(image1, image1_proj, PT, image2.size());
 		cv::warpPerspective(image1c, image1_projc, PT, image2.size());
 
@@ -296,6 +314,7 @@ int main (int argc, char* argv[])
 		Mat m = mergeImages(image1, image2, 1);
 		m.copyTo(result);
 	}
-        return 0;
+
+    return 0;
 }  
 
