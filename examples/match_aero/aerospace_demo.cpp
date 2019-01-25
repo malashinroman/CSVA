@@ -39,8 +39,11 @@ Permission is hereby granted, free of charge, to any person obtaining
 #include "common_lib/feature_extractors.h"
 #include "csva_lib/csva.h"
 #include <opencv2/calib3d/calib3d.hpp>
+#include <opencv2/calib3d/calib3d_c.h>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui.hpp>
+#include <opencv2/imgproc/imgproc_c.h>
+
 //#include <boost/filesystem.hpp>
 #include <set>
 using namespace std;
@@ -61,7 +64,7 @@ int makeDirectory(string folder)
 	return 0;
 }
 
-Mat printMatches(vector<KeyPoint> pts1, vector<KeyPoint> pts2, vector<DMatch> matches, Mat image1, Mat image2, int flags)
+Mat printMatches(vector<KeyPoint> pts1, vector<KeyPoint> pts2, vector<DMatch> matches, Mat image1, Mat image2, cv::DrawMatchesFlags flags)
 {
 	Mat outImage;
 	drawMatches(image1, pts1, image2, pts2, matches, outImage, CV_RGB(0, 255, 0), CV_RGB(0, 255, 0), vector<char>(), flags);
@@ -305,7 +308,11 @@ int main (int argc, char* argv[])
 		alignedImagesc.copyTo(result);
 		//!imwrite(DebugInfoPath + "/kpts_m.jpg", res);
 		vector<int> compression_params;
+#if (CV_MAJOR_VERSION >= 4)
+		compression_params.push_back(cv::IMWRITE_JPEG_QUALITY);
+#else
 		compression_params.push_back(CV_IMWRITE_JPEG_QUALITY);
+#endif
 		compression_params.push_back(SAVE_JPG_QUALITY);
 
 		imwrite(resultFolder + "/reg_green.jpg", outim, compression_params);

@@ -1,7 +1,7 @@
 PROJECT( match3D )
 cmake_minimum_required(VERSION 3.4)
 
-FIND_PACKAGE( OpenCV 3.1 REQUIRED core imgproc highgui)
+FIND_PACKAGE( OpenCV REQUIRED core imgproc highgui)
 include_directories(${OpenCV_INCLUDE_DIRS})
 
 add_compile_options(-std=c++11)
