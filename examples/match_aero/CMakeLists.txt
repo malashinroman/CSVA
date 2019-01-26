@@ -1,7 +1,7 @@
 PROJECT( match_aero )
 cmake_minimum_required(VERSION 3.4)
 
-FIND_PACKAGE( OpenCV 3.1 REQUIRED core imgproc highgui)
+FIND_PACKAGE( OpenCV REQUIRED core imgproc highgui)
 include_directories(${OpenCV_INCLUDE_DIRS})
 
 if (UNIX)
@@ -14,7 +14,7 @@ if (WIN32)
 	include_directories(${Boost_INCLUDE_DIRS})
 	set (CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS OFF)
 	link_directories(${Boost_LIBRARY_DIR})
-	message(${Boost_LIBRARY_DIR})
+	# message(${Boost_LIBRARY_DIR})
 endif (WIN32)
 
 if (UNIX)

@@ -35,6 +35,7 @@ Permission is hereby granted, free of charge, to any person obtaining
 #include "matching_hough.h"
 #include <unordered_set>
 #include <opencv2/calib3d/calib3d.hpp>
+#include <opencv2/calib3d/calib3d_c.h>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/objdetect/objdetect.hpp>
 #include <opencv2/video/video.hpp>

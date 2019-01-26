@@ -1,6 +1,6 @@
 PROJECT( common_lib )
-cmake_minimum_required (VERSION 2.6)
-FIND_PACKAGE(OpenCV 3.1 REQUIRED core imgproc highgui features2d xfeatures2d ml video shape calib3d)
+cmake_minimum_required (VERSION 3.4)
+FIND_PACKAGE(OpenCV REQUIRED core imgproc highgui features2d xfeatures2d ml video shape calib3d)
 
 if (UNIX)
 	find_package(Boost REQUIRED COMPONENTS filesystem)
@@ -13,7 +13,7 @@ if (WIN32)
 	include_directories(${Boost_INCLUDE_DIRS})
 	set (CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS OFF)
 	link_directories(${Boost_LIBRARY_DIR})
-	message(${Boost_LIBRARY_DIR})
+	# message(${Boost_LIBRARY_DIR})
 endif (WIN32)
 
 add_compile_options(-std=c++11)
