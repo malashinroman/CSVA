@@ -96,7 +96,7 @@ If you find this code usefull please cite one or both of these papers
 
 ## More details
 
-Detailed explanation is given in this [paper](http://www.bookmetrix.com/detail/chapter/a7f25ed5-3900-4ab8-8631-d5da27cc1098#readers). Will be available soon.
+Detailed explanation is given in this [paper](http://www.bookmetrix.com/detail/chapter/a7f25ed5-3900-4ab8-8631-d5da27cc1098#readers).
 
 Here is some explanation without diving into details.
 
