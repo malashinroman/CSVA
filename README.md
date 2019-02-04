@@ -4,35 +4,40 @@ C++ implementation of the robust keypoint elimination algorithm described in the
 ```
 Malashin R.O. Core algorithm for structural verification of keypoint matches. Intelligent Systems Reference Library. Computer Vision in Control Systems-3. 2018. P. 251-286
 ```
-
-## short description
+## Description
 
 CSVA (“core” structural verification algorithm) is a robust and fast algorithm for outlier elimination of keypoint matches (e.g. SURF, SIFT or BRISK features) that heavily exploits gemetrical constraints. It can be used by developers and researches in different practical tasks with minor adaptation. CSVA an improved version of SIFT clustering proposed by David Lowe in SIFT.
 
 ## Demo video
 
-[![IMAGE ALT TEXT](data/doc/video.png)](https://www.youtube.com/watch?v=ik6-zfD-ozk "Demo video")
+[video](https://www.youtube.com/watch?v=ik6-zfD-ozk "Demo video")
 
 for more demonstration results visit [project page](https://malashinroman.github.io/CSVA/)
 
 ## Prerequisites
 
-### opencv
+```
+opencv
+```
 
 opencv3.1 and opencv4.0 were tested
 
-### opencv-contrib
+```
+opencv-contrib
+```
 
 You will need xfeatures2d from opencv-contrib to compile and test with SURF and SIFT
 
-### Boost 
+```
+Boost 
+```
 
 CSVA uses boost library in it's core
 
 ### Operating system
 Windows 7 and Ubuntu 14.04 were tested
 
-## compilation
+## Compile
 
 Cmake is a recommended tool for creating CSVA project
 
