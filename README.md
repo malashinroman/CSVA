@@ -22,14 +22,18 @@ opencv
 CSVA uses openCV structures like cv::DMatch and cv::KeyPoint internally, opencv3.1 and opencv4.0 were tested
 
 ```
+
+
 opencv-contrib
 ```
 You will need xfeatures2d from opencv-contrib to compile and test with SURF and SIFT
+
 
 ```
 Boost 
 ```
 CSVA uses boost library in it's core
+
 
 ### Operating system
 Windows 7 and Ubuntu 14.04 were tested
