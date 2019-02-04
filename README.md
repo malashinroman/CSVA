@@ -10,7 +10,7 @@ CSVA (“core” structural verification algorithm) is a robust and fast algorit
 
 ## Demo video
 
-[video](https://www.youtube.com/watch?v=ik6-zfD-ozk "Demo video")
+[video1](https://www.youtube.com/watch?v=ik6-zfD-ozk "Demo video") and [video2](https://www.youtube.com/watch?v=9miJET-FDbo)
 
 for more demonstration results visit [project page](https://malashinroman.github.io/CSVA/)
 
@@ -19,19 +19,16 @@ for more demonstration results visit [project page](https://malashinroman.github
 ```
 opencv
 ```
-
-opencv3.1 and opencv4.0 were tested
+CSVA uses openCV structures like cv::DMatch and cv::KeyPoint internally, opencv3.1 and opencv4.0 were tested
 
 ```
 opencv-contrib
 ```
-
 You will need xfeatures2d from opencv-contrib to compile and test with SURF and SIFT
 
 ```
 Boost 
 ```
-
 CSVA uses boost library in it's core
 
 ### Operating system
