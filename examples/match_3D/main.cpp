@@ -1,33 +1,27 @@
-#include <opencv2/core/core.hpp>
-#include "opencv2/features2d/features2d.hpp"
-#include "opencv2/highgui/highgui.hpp"
-#include "opencv2/features2d.hpp"
-#include "opencv2/xfeatures2d.hpp"
-#include <opencv2/calib3d/calib3d.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-#include "common_lib/feature_extractors.h"
-//#include "common_lib/DirectoryParser.h"
+#include <time.h>
+#include <opencv2/opencv.hpp>
+
 #include "csva_lib/csva.h"
 #include "3Drecognition.h"
-#include <time.h>
-using namespace cv;
-using namespace std;
 
-Mat printMatches(vector<KeyPoint> pts1, vector<KeyPoint> pts2, vector<DMatch> matches, Mat image1, Mat image2, cv::DrawMatchesFlags flags)
+///
+cv::Mat printMatches(std::vector<cv::KeyPoint> pts1, std::vector<cv::KeyPoint> pts2, std::vector<cv::DMatch> matches, cv::Mat image1, cv::Mat image2, cv::DrawMatchesFlags flags)
 {
-	Mat outImage;
-	drawMatches(image1, pts1, image2, pts2, matches, outImage, CV_RGB(0, 255, 0), CV_RGB(0, 255, 0), vector<char>(), flags);
+    cv::Mat outImage;
+    cv::drawMatches(image1, pts1, image2, pts2, matches, outImage, CV_RGB(0, 255, 0), CV_RGB(0, 255, 0), std::vector<char>(), flags);
 	return outImage;
 }
+
+///
 int main(int argc, char* argv[])
 {
-	Mat result;
-	vector<KeyPoint> kpts1;
-	vector<KeyPoint> kpts2;
-	Mat image1 = imread(argv[1]);
-	Mat image2 = imread(argv[2]);
-	vector<DMatch> inliers = call3D(argv[1], argv[2], &result, kpts1, kpts2, 352, 0, 0);
-	result = printMatches(kpts1, kpts2, inliers, image1, image2, 
-		DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS | DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
+    cv::Mat result;
+    std::vector<cv::KeyPoint> kpts1;
+    std::vector<cv::KeyPoint> kpts2;
+    cv::Mat image1 = cv::imread(argv[1]);
+    cv::Mat image2 = cv::imread(argv[2]);
+    std::vector<cv::DMatch> inliers = call3D(argv[1], argv[2], &result, kpts1, kpts2, 352, 0, 0);
+    result = printMatches(kpts1, kpts2, inliers, image1, image2, cv::DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS | cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
+    cv::imwrite("result.jpg", result);
     return 0;
 }

@@ -41,8 +41,6 @@ Permission is hereby granted, free of charge, to any person obtaining
 #include <opencv2/video/video.hpp>
 
 #include <iostream>
-using namespace cv;
-
 
 Cluster_data::Cluster_data(const Cluster_data& other)
 {
@@ -55,22 +53,24 @@ Cluster_data::Cluster_data(const Cluster_data& other)
 	this->YBin = other.YBin;
 	this->transfMat = this->transfMat.clone();
 }
-void Cluster_data::exclude(DMatch match)
+
+void Cluster_data::exclude(cv::DMatch match)
 {
-	for (vector<DMatch>::iterator it = this->matches.begin(); it != this->matches.end(); it++)
+    for (std::vector<cv::DMatch>::iterator it = this->matches.begin(); it != this->matches.end(); it++)
 	{
-		DMatch cmatch = *(it);
+        cv::DMatch cmatch = *(it);
 		int query = cmatch.queryIdx;
 		int train = cmatch.trainIdx;
 		if ((query == match.queryIdx) && (train = match.trainIdx))
 		{
-			//vector<DMatch>::iterator toRemove = it;
+            //vector<cv::DMatch>::iterator toRemove = it;
 			//it--;
 			this->matches.erase(it);
 			break;
 		}
 	}
 }
+
 Cluster_data Cluster_data::operator=(const Cluster_data& other)
 {
 	this->matches = other.matches;
@@ -91,16 +91,11 @@ bool compare(Cluster_data a, Cluster_data b)
 	return (a.matches.size() > b.matches.size());
 }
 
-Cluster_data::~Cluster_data()
-{
-
-}
-
-Point2f Cluster_data::ClusterPosition(const vector<KeyPoint>& keypoints1, const vector<KeyPoint>& keypoints2)
+cv::Point2f Cluster_data::ClusterPosition(const std::vector<cv::KeyPoint>& keypoints1, const std::vector<cv::KeyPoint>& keypoints2)
 {
 	double meanx = 0;
 	double meany = 0;
-	for(vector<DMatch>::iterator match = this->matches.begin(); match != this->matches.end(); match++)
+    for(std::vector<cv::DMatch>::iterator match = this->matches.begin(); match != this->matches.end(); match++)
 	{
 		int qi = match->queryIdx;
 		int ti = match->trainIdx;
@@ -111,8 +106,8 @@ Point2f Cluster_data::ClusterPosition(const vector<KeyPoint>& keypoints1, const 
 
 	meanx /= this->matches.size();
 	meany /= this->matches.size();
-	this->position = Point2d(meanx, meany);
-	return Point2d(meanx, meany);
+    this->position = cv::Point2d(meanx, meany);
+    return cv::Point2d(meanx, meany);
 }
 
 #define MAX_COMB 400
@@ -128,45 +123,44 @@ int comb(int m, int n)
 		mat[0][j] = 1;
 		if (j == 0)
 		{
-			for (i = 1; i <= m - n; i++) mat[i][j] = i + 1;
+            for (i = 1; i <= m - n; i++)
+                mat[i][j] = i + 1;
 		}
 		else
 		{
-			for (i = 1; i <= m - n; i++) mat[i][j] = mat[i - 1][j] + mat[i][j - 1];
+            for (i = 1; i <= m - n; i++)
+                mat[i][j] = mat[i - 1][j] + mat[i][j - 1];
 		}
 	}
 	return (mat[m - n][n - 1]);
 }
 
-Mat Cluster_data::fitModelParamsSimilarityRansac(const vector<KeyPoint>& keypoints1, 
-	const vector<KeyPoint>& keypoints2, 
-	const Mat& image1, const Mat& image2,
+cv::Mat Cluster_data::fitModelParamsSimilarityRansac(const std::vector<cv::KeyPoint>& keypoints1,
+    const std::vector<cv::KeyPoint>& keypoints2,
+    const cv::Mat& image1, const cv::Mat& image2,
 	int iterations, int hip_check, double model_distT, double AngleThresh, double ScaleThresh)
 {	
 	int m = matches.size();
 	if (m < 3)
-	{
-		return Mat();
-	}
+        return cv::Mat();
+
 	double scThresh = ScaleThresh;
 	double angleThresh = AngleThresh;
-	vector<KeyPoint> kpts1, kpts2;
+    std::vector<cv::KeyPoint> kpts1, kpts2;
 
 	sortMatchedKeypointsInQualityOrder(matches, keypoints1, keypoints2, kpts1, kpts2);
 	
 	int best_inliers_num = 0;
-	Mat bestTransf;
+    cv::Mat bestTransf;
 	int hypoCheck = 0;
-	vector<DMatch> matches_passed;
+    std::vector<cv::DMatch> matches_passed;
 	int ind1 = 0;
 	int ind2 = 1;
 	int useProScac = 0;
 	int extended_output = 0;
 	int n_comb = iterations + 1;
 	if (matches.size() < MAX_COMB)
-	{
 		n_comb = comb(matches.size(), 2);
-	}
 	if (n_comb < iterations)
 	{
 		iterations = n_comb;
@@ -174,7 +168,7 @@ Mat Cluster_data::fitModelParamsSimilarityRansac(const vector<KeyPoint>& keypoin
 	}
 	for(int i = 0; i < iterations; i++)
 	{
-		Mat transfMat(2, 3, CV_64F);
+        cv::Mat transfMat(2, 3, CV_64F);
 
 		int ind[2];
 		if (useProScac)
@@ -187,9 +181,7 @@ Mat Cluster_data::fitModelParamsSimilarityRansac(const vector<KeyPoint>& keypoin
 				ind1++;
 				ind2 = ind1 + 1;
 				if(ind2 == m)
-				{
 					break;
-				}
 			}
 		}
 		else
@@ -208,12 +200,12 @@ Mat Cluster_data::fitModelParamsSimilarityRansac(const vector<KeyPoint>& keypoin
 			}
 		}
 		assert(ind[0] != ind[1]);
-		KeyPoint kp11, kp12, kp21, kp22, tkp11, tkp22;
+        cv::KeyPoint kp11, kp12, kp21, kp22, tkp11, tkp22;
 		kp11 = kpts1.at(ind[0]);
 		kp12 = kpts1.at(ind[1]);
 		kp21 = kpts2.at(ind[0]);
 		kp22 = kpts2.at(ind[1]);
-		Mat out;
+        cv::Mat out;
 		double x11, x12, x21, x22, y11, y12, y21, y22;
 		x11 = kp11.pt.x;
 		x12 = kp12.pt.x;
@@ -268,30 +260,19 @@ Mat Cluster_data::fitModelParamsSimilarityRansac(const vector<KeyPoint>& keypoin
 		double scRatio1 = S > mscale1 ? S / mscale1 : mscale1 / S;
 		double scRatio2 = S > mscale2 ? S / mscale2 : mscale2 / S;
 
-		Point2f modelPoint = Point2f(float(image1.size().width) / 2.f, float(image1.size().height) / 2.f);
-		Point2f modelp1 = predictModelPosition(kp11, kp21, modelPoint);
-		Point2f modelp2 = predictModelPosition(kp12, kp22, modelPoint);
+        cv::Point2f modelPoint(float(image1.size().width) / 2.f, float(image1.size().height) / 2.f);
+        cv::Point2f modelp1 = predictModelPosition(kp11, kp21, modelPoint);
+        cv::Point2f modelp2 = predictModelPosition(kp12, kp22, modelPoint);
 		double dist = euclideanDistacne(modelp1, modelp2);
 
 		if(scRatio > scThresh)
-		{
 			continue;
-		}
-
 		if (fabs(mangleDev) > angleThresh)
-		{
 			continue;
-		}
-
 		if (fabs(ThetaDev1) > angleThresh || fabs(ThetaDev2) > angleThresh)
-		{
 			continue;
-		}
-
 		if ((scRatio1 > scThresh) || (scRatio2 > scThresh))
-		{
 			continue;
-		}
 
 		int maxres = image2.size().width > image2.size().height ? image2.size().width : image2.size().height;
 
@@ -299,11 +280,10 @@ Mat Cluster_data::fitModelParamsSimilarityRansac(const vector<KeyPoint>& keypoin
 		double distThresh = maxres * biggestIndivScale * model_distT + maxres*0.01;
 
 		if(dist > distThresh)
-		{
 			continue;
-		}
+
 		double inlier_dist = maxres * S * model_distT + maxres*0.01;
-		vector<DMatch> goodmatches;
+        std::vector<cv::DMatch> goodmatches;
 		int inliers_num = 0;
 
 		transfMat.at<double>(0, 0) = S*cos(theta2);
@@ -315,16 +295,16 @@ Mat Cluster_data::fitModelParamsSimilarityRansac(const vector<KeyPoint>& keypoin
 
 		for(size_t j = 0; j < kpts1.size(); j++)
 		{
-			KeyPoint kp1 = kpts1.at(j);
-			KeyPoint kp2 = kpts2.at(j);
+            cv::KeyPoint kp1 = kpts1.at(j);
+            cv::KeyPoint kp2 = kpts2.at(j);
 
-			Mat p(3, 1, CV_64F);
+            cv::Mat p(3, 1, CV_64F);
 			p.at<double>(0) = kp1.pt.x;
 			p.at<double>(1) = kp1.pt.y;
 			p.at<double>(2) = 1.;
 
-			Mat p_ = transfMat*p;
-			Point2f pointProj = Point2f(float(p_.at<double>(0)), float(p_.at<double>(1)));
+            cv::Mat p_ = transfMat*p;
+            cv::Point2f pointProj(float(p_.at<double>(0)), float(p_.at<double>(1)));
 			double dist = euclideanDistacne(pointProj, kp2.pt);
 
 			double mangle1 = getMutualAngle(kp1, kp2);
@@ -333,17 +313,12 @@ Mat Cluster_data::fitModelParamsSimilarityRansac(const vector<KeyPoint>& keypoin
 			double scRatio1 = S > mscale1 ? S / mscale1 : mscale1 / S;
 
 			if(dist > inlier_dist)
-			{
 				continue;
-			}
 			if(scRatio1 > scThresh)
-			{
 				continue;
-			}
 			if(fabs(ThetaDev1) > angleThresh)
-			{
 				continue;
-			}
+
 			goodmatches.push_back(matches.at(j));
 			inliers_num++;
 		}
@@ -353,12 +328,11 @@ Mat Cluster_data::fitModelParamsSimilarityRansac(const vector<KeyPoint>& keypoin
 			best_inliers_num = inliers_num;
 			bestTransf = transfMat.clone();
 		}
-		//break;
+
 		hypoCheck++;
 		if(hypoCheck > hip_check)
-		{
 			break;
-		}
+
 	}
 	double deleteThresh = 0.01;
 	if(matches_passed.size() > 0)
@@ -366,48 +340,45 @@ Mat Cluster_data::fitModelParamsSimilarityRansac(const vector<KeyPoint>& keypoin
 		double in_out_ratio = (double)(matches_passed.size()) / matches.size();
 		this->matches = matches_passed;
 		if (in_out_ratio < deleteThresh)
-		{
-			this->matches = vector<DMatch>();
-		}
+            this->matches = std::vector<cv::DMatch>();
 	}
 	else
 	{
-		this->matches = vector<DMatch>();
+        this->matches = std::vector<cv::DMatch>();
 	}
 	this->transfMat = bestTransf;
 	return this->transfMat;
 }
 
-Mat Cluster_data::fitModelParams(const vector<KeyPoint>& keypoints1, const vector<KeyPoint>& keypoints2, 
+cv::Mat Cluster_data::fitModelParams(const std::vector<cv::KeyPoint>& keypoints1, const std::vector<cv::KeyPoint>& keypoints2,
 	TransformType transfType, int extended_output, 
-	Mat image1, Mat image2, 
+    cv::Mat image1, cv::Mat image2,
 	double inlier_dist, 
 	int RANSAC_iter, int hip_check, double deleteThresh)
 {
-	Mat solution;
+    cv::Mat solution;
 	int s = this->matches.size();
 	if (s < 3)
-	{
-		return Mat();
-	}
-	vector<DMatch>::iterator it;
+        return cv::Mat();
+
+    std::vector<cv::DMatch>::iterator it;
 	int n =0;
 	int i =0;
 
-	Mat A;
-	Mat B;
+    cv::Mat A;
+    cv::Mat B;
 	if(transfType == TransformType::AFFINE_TRANSFORM)
 	{
-		A = Mat(s*2, 6, CV_64F, 0.);
-		B = Mat(s*2, 1, CV_64F, 0.);
+        A = cv::Mat(s*2, 6, CV_64F, 0.);
+        B = cv::Mat(s*2, 1, CV_64F, 0.);
 		for(it = this->matches.begin(); it != this->matches.end(); it++)
 		{
-			Point2f p1 = keypoints1.at(it->queryIdx).pt;
-			Point2f p2 = keypoints2.at(it->trainIdx).pt;
+            cv::Point2f p1 = keypoints1.at(it->queryIdx).pt;
+            cv::Point2f p2 = keypoints2.at(it->trainIdx).pt;
 			double line1[6] = {p1.x, p1.y, 0, 0, 1, 0};
 			double line2[6] = {0, 0, p1.x, p1.y, 0, 1};
-			Mat a1(1, 6, CV_64F, &line1);
-			Mat a2(1, 6, CV_64F, &line2);
+            cv::Mat a1(1, 6, CV_64F, &line1);
+            cv::Mat a2(1, 6, CV_64F, &line2);
 
 			a1.row(0).copyTo(A.row(i));
 			B.at<double>(i) = (p2.x);
@@ -419,18 +390,17 @@ Mat Cluster_data::fitModelParams(const vector<KeyPoint>& keypoints1, const vecto
 	}
 	if(transfType == TransformType::SIMILARITY_TRANSFORM)
 	{
-
-		A = Mat(s*2, 4, CV_64F, 0.);
-		B = Mat(s*2, 1, CV_64F, 0.);
+        A = cv::Mat(s*2, 4, CV_64F, 0.);
+        B = cv::Mat(s*2, 1, CV_64F, 0.);
 		for(it = this->matches.begin(); it != this->matches.end(); it++)
 		{
-			Point2f p1 = keypoints1.at(it->queryIdx).pt;
-			Point2f p2 = keypoints2.at(it->trainIdx).pt;
+            cv::Point2f p1 = keypoints1.at(it->queryIdx).pt;
+            cv::Point2f p2 = keypoints2.at(it->trainIdx).pt;
 			double line1[4] = {p1.x, -p1.y, 1, 0};
 			double line2[4] = {p1.y, p1.x, 0, 1};
 
-			Mat a1(1, 4, CV_64F, &line1);
-			Mat a2(1, 4, CV_64F, &line2);
+            cv::Mat a1(1, 4, CV_64F, &line1);
+            cv::Mat a2(1, 4, CV_64F, &line2);
 
 			a1.row(0).copyTo(A.row(i));
 			B.at<double>(i) = (p2.x);
@@ -445,10 +415,10 @@ Mat Cluster_data::fitModelParams(const vector<KeyPoint>& keypoints1, const vecto
 		|| transfType == TransformType::SIMILARITY_TRANSFORM)
 	{
 		///Both solutions give the same result
-		solve(A, B, solution, DECOMP_SVD);
+        solve(A, B, solution, cv::DECOMP_SVD);
 		//Mat solution2 = (A.t()*A).inv()*(A.t()*B);
 	}
-	transfMat = Mat(2,3, CV_64F);
+    transfMat = cv::Mat(2,3, CV_64F);
 
 	if(transfType == TransformType::AFFINE_TRANSFORM)
 	{
@@ -472,13 +442,13 @@ Mat Cluster_data::fitModelParams(const vector<KeyPoint>& keypoints1, const vecto
 	
 	if(transfType == TransformType::OPENCV_AFFINE)
 	{
-		vector<KeyPoint> kpts1;
-		vector<KeyPoint> kpts2;
+        std::vector<cv::KeyPoint> kpts1;
+        std::vector<cv::KeyPoint> kpts2;
 		getMatchedKeypoints(this->matches, keypoints1, keypoints2, kpts1, kpts2);
-		vector<Point2f> points2D1;
-		vector<Point2f> points2D2;
-		Mat P1 = Mat(2, this->matches.size(), CV_64F, 0.);
-		Mat P2 = Mat(2, this->matches.size(), CV_64F, 0.);
+        std::vector<cv::Point2f> points2D1;
+        std::vector<cv::Point2f> points2D2;
+        cv::Mat P1(2, this->matches.size(), CV_64F, 0.);
+        cv::Mat P2(2, this->matches.size(), CV_64F, 0.);
 		for(size_t i = 0; i < kpts1.size(); i++)
 		{
 			P1.at<double>(0,i) = kpts1.at(i).pt.x;
@@ -492,13 +462,13 @@ Mat Cluster_data::fitModelParams(const vector<KeyPoint>& keypoints1, const vecto
 	}
 	if(transfType == TransformType::OPENCV_SIMILARITY)
 	{
-		vector<KeyPoint> kpts1;
-		vector<KeyPoint> kpts2;
+        std::vector<cv::KeyPoint> kpts1;
+        std::vector<cv::KeyPoint> kpts2;
 		getMatchedKeypoints(this->matches, keypoints1, keypoints2, kpts1, kpts2);
-		vector<Point2f> points2D1;
-		vector<Point2f> points2D2;
-		Mat P1 = Mat(this->matches.size(), 2, CV_64F, 0.);
-		Mat P2 = Mat(this->matches.size(), 2, CV_64F, 0.);
+        std::vector<cv::Point2f> points2D1;
+        std::vector<cv::Point2f> points2D2;
+        cv::Mat P1(this->matches.size(), 2, CV_64F, 0.);
+        cv::Mat P2(this->matches.size(), 2, CV_64F, 0.);
 		for(size_t i = 0; i < kpts1.size(); i++)
 		{
 			P1.at<double>(i,0) = kpts1.at(i).pt.x;
@@ -511,8 +481,6 @@ Mat Cluster_data::fitModelParams(const vector<KeyPoint>& keypoints1, const vecto
 		transfMat = estimateRigidTransform(points2D1, points2D2, false);
 	}
 
-	
-
 	if(transfType == TransformType::SIMILARITY_RANSAC)
 	{
 		int m = matches.size();
@@ -521,10 +489,9 @@ Mat Cluster_data::fitModelParams(const vector<KeyPoint>& keypoints1, const vecto
 		int iterations = 100;
 		int bruteForce = 0;
 		if(RANSAC_iter!=0)
-		{
 			iterations = RANSAC_iter;
-		}
-		if(m < 46)
+
+        if(m < 46)
 		{
 			if(comb[m] < iterations)
 			{
@@ -534,17 +501,16 @@ Mat Cluster_data::fitModelParams(const vector<KeyPoint>& keypoints1, const vecto
 			}
 		}
 		if(fabs(inlier_dist) < 0.0001)
-		{
 			inlier_dist = 60;
-		}
+
 		double scThresh = sqrt(2.);
 		double angleThresh = 10; //FIXME 15 - gives much more false_positive matches
-		vector<KeyPoint> kpts1, kpts2;
+        std::vector<cv::KeyPoint> kpts1, kpts2;
 		getMatchedKeypoints(matches, keypoints1, keypoints2, kpts1, kpts2);
 		int best_inliers_num = 0;
-		Mat bestTransf;
+        cv::Mat bestTransf;
 		int hypoCheck = 0;
-		vector<DMatch> matches_passed;
+        std::vector<cv::DMatch> matches_passed;
 		int ind1 =0;
 		int ind2 = 1;
 		for(int i = 0; i < iterations; i++)
@@ -578,13 +544,13 @@ Mat Cluster_data::fitModelParams(const vector<KeyPoint>& keypoints1, const vecto
 					}
 				}
 			}
-			KeyPoint kp11, kp12, kp21, kp22, tkp11, tkp22;
+            cv::KeyPoint kp11, kp12, kp21, kp22, tkp11, tkp22;
 			kp11 = kpts1.at(ind[0]);
 			kp12 = kpts1.at(ind[1]);
 			kp21 = kpts2.at(ind[0]);
 			kp22 = kpts2.at(ind[1]);
 			
-			Mat out;
+            cv::Mat out;
 			
 			double x11, x12, x21, x22, y11, y12, y21, y22;
 			x11 = kp11.pt.x;
@@ -605,14 +571,10 @@ Mat Cluster_data::fitModelParams(const vector<KeyPoint>& keypoints1, const vecto
 			double scRatio = mscale1 > mscale2 ? mscale1 / mscale2 : mscale2 / mscale1;
 
 			if(scRatio > scThresh)
-			{
 				continue;
-			}
 
 			if(fabs(mangle1 - mangle2) > angleThresh)
-			{
 				continue;
-			}
 
 			double a = (x11 - x12)*(x11 - x12) + (y11 - y12)*(y11 - y12);
 			double b = (x21 - x22)*(x21 - x22) + (y21 - y22)*(y21 - y22);
@@ -621,9 +583,8 @@ Mat Cluster_data::fitModelParams(const vector<KeyPoint>& keypoints1, const vecto
 			double scRatio2 = S > mscale2 ? S / mscale2 : mscale2 / S;
 
 			if((scRatio1 > scThresh) || (scRatio2 > scThresh))
-			{
 				continue;
-			}
+
 			double dx1 = x11-x12;
 			double dy1 = y11-y12;
 			double dx2 = x21-x22;
@@ -637,20 +598,16 @@ Mat Cluster_data::fitModelParams(const vector<KeyPoint>& keypoints1, const vecto
 				Theta = Theta - 360;
 
 			if(fabs(Theta - mangle1) > angleThresh || fabs(Theta - mangle2) > angleThresh)
-			{
 				continue;
-			}
 
-			Point2f modelPoint = Point2f(image1.size().width / 2.f, image1.size().height / 2.f);
-			Point2f modelp1 = predictModelPosition(kp11, kp21, modelPoint);
-			Point2f modelp2 = predictModelPosition(kp12, kp22, modelPoint);
+            cv::Point2f modelPoint(image1.size().width / 2.f, image1.size().height / 2.f);
+            cv::Point2f modelp1 = predictModelPosition(kp11, kp21, modelPoint);
+            cv::Point2f modelp2 = predictModelPosition(kp12, kp22, modelPoint);
 			double dist = euclideanDistacne(modelp1, modelp2);
 			int maxres = int(0.8 * sqrt(1.*image2.size().width*image2.size().width + image2.size().height*image2.size().height));
 			double distThresh = maxres / 8;
 			if(dist > distThresh)
-			{
 				continue;
-			}
 
 			Theta = - Theta / 180. * CV_PI;
 			double tx = x22 - (S*x12*cos(Theta) - S*y12*sin(Theta));
@@ -667,16 +624,16 @@ Mat Cluster_data::fitModelParams(const vector<KeyPoint>& keypoints1, const vecto
 			transfMat.at<double>(0,2) = tx;
 			transfMat.at<double>(1,2) = ty;
 
-			vector<DMatch> goodmatches;
+            std::vector<cv::DMatch> goodmatches;
 			for(size_t j = 0; j < kpts1.size(); j++)
 			{
 
-				Mat p(3,1, CV_64F);
+                cv::Mat p(3,1, CV_64F);
 				p.at<double>(0) = kpts1.at(j).pt.x;
 				p.at<double>(1) = kpts1.at(j).pt.y;
 				p.at<double>(2) = 1;
-				Mat p_ = transfMat*p;
-				Point2f pointProj = Point2f(float(p_.at<double>(0)), float(p_.at<double>(1)));
+                cv::Mat p_ = transfMat*p;
+                cv::Point2f pointProj(float(p_.at<double>(0)), float(p_.at<double>(1)));
 				double dist = euclideanDistacne(pointProj, kpts2.at(j).pt);
 
 				if(dist < inlier_dist)
@@ -685,15 +642,13 @@ Mat Cluster_data::fitModelParams(const vector<KeyPoint>& keypoints1, const vecto
 					getScaleAndRotation(transfMat, S, Theta);
 					double mangle1 = getMutualAngle(kpts1.at(j), kpts2.at(j));
 					if(fabs(Theta - mangle1) > angleThresh)
-					{
 						continue;
-					}
+
 					double mscale1 = getMutualScale(kpts1.at(j), kpts2.at(j));
 					double scRatio1 = S > mscale1 ? S / mscale1 : mscale1 / S;
 					if((scRatio1 > scThresh))
-					{
 						continue;
-					}
+
 					goodmatches.push_back(matches.at(j));
 					inliers_num++;
 				}
@@ -708,9 +663,7 @@ Mat Cluster_data::fitModelParams(const vector<KeyPoint>& keypoints1, const vecto
 			//break;
 			hypoCheck++;
 			if(hypoCheck > hip_check)
-			{
 				break;
-			}
 		}
 
 		if(matches_passed.size() > 0)
@@ -719,26 +672,24 @@ Mat Cluster_data::fitModelParams(const vector<KeyPoint>& keypoints1, const vecto
 			this->matches = matches_passed;
 
 			if(in_out_ratio < deleteThresh)
-			{
-				this->matches = vector<DMatch>();
-			}
+                this->matches = std::vector<cv::DMatch>();
 		}
 		else
 		{
-			this->matches = vector<DMatch>();
+            this->matches = std::vector<cv::DMatch>();
 		}
 		this->transfMat = bestTransf;
 	}
 	
 	if(transfType == TransformType::OPENCV_HOMOGRAPHY_LMEDS)
 	{
-		vector<KeyPoint> kpts1;
-		vector<KeyPoint> kpts2;
+        std::vector<cv::KeyPoint> kpts1;
+        std::vector<cv::KeyPoint> kpts2;
 		getMatchedKeypoints(this->matches, keypoints1, keypoints2, kpts1, kpts2);
-		vector<Point2f> points2D1;
-		vector<Point2f> points2D2;
-		Mat P1 = Mat(this->matches.size(), 2, CV_64F, 0.);
-		Mat P2 = Mat(this->matches.size(), 2, CV_64F, 0.);
+        std::vector<cv::Point2f> points2D1;
+        std::vector<cv::Point2f> points2D2;
+        cv::Mat P1(this->matches.size(), 2, CV_64F, 0.);
+        cv::Mat P2(this->matches.size(), 2, CV_64F, 0.);
 		for(size_t i = 0; i < kpts1.size(); i++)
 		{
 			P1.at<double>(i,0) = kpts1.at(i).pt.x;
@@ -750,7 +701,7 @@ Mat Cluster_data::fitModelParams(const vector<KeyPoint>& keypoints1, const vecto
 		}
 		if(points2D1.size() < 4)
 		{
-			transfMat = Mat();
+            transfMat = cv::Mat();
 		}
 		else
 		{
@@ -761,17 +712,15 @@ Mat Cluster_data::fitModelParams(const vector<KeyPoint>& keypoints1, const vecto
 		}
 	}
 
-
-
 	if(transfType == TransformType::OPENCV_HOMOGRAPHY_RANSAC)
 	{
-		vector<KeyPoint> kpts1;
-		vector<KeyPoint> kpts2;
+        std::vector<cv::KeyPoint> kpts1;
+        std::vector<cv::KeyPoint> kpts2;
 		getMatchedKeypoints(this->matches, keypoints1, keypoints2, kpts1, kpts2);
-		vector<Point2f> points2D1;
-		vector<Point2f> points2D2;
-		Mat P1 = Mat(this->matches.size(), 2, CV_64F, 0.);
-		Mat P2 = Mat(this->matches.size(), 2, CV_64F, 0.);
+        std::vector<cv::Point2f> points2D1;
+        std::vector<cv::Point2f> points2D2;
+        cv::Mat P1(this->matches.size(), 2, CV_64F, 0.);
+        cv::Mat P2(this->matches.size(), 2, CV_64F, 0.);
 		for(size_t i = 0; i < kpts1.size(); i++)
 		{
 			P1.at<double>(i,0) = kpts1.at(i).pt.x;
@@ -783,7 +732,7 @@ Mat Cluster_data::fitModelParams(const vector<KeyPoint>& keypoints1, const vecto
 		}
 		if(points2D1.size() < 4)
 		{
-			transfMat = Mat();
+            transfMat = cv::Mat();
 		}
 		else
 		{
@@ -795,27 +744,17 @@ Mat Cluster_data::fitModelParams(const vector<KeyPoint>& keypoints1, const vecto
 			transfMat = findHomography(points2D1, points2D2, CV_RANSAC, inlier_dist);
 		}
 	}
-
-
-
-	//if(transfType == EPIPOLAR_CONSTRAINT)
-	//{
-	//		double diag = sqrt((double)(image1.size().width * image1.size().width + image1.size().height * image1.size().height));
-	//		double dist = diag*0.03;
-	//		this->matches = EpipolarConstraint(keypoints1, keypoints2, matches, dist);
-	//		transfMat = Mat();
-	//}
     
 	return transfMat;
 }
 
-vector<DMatch> invertMatches(vector<DMatch> matches)
+std::vector<cv::DMatch> invertMatches(std::vector<cv::DMatch> matches)
 {
-	vector<DMatch> invMatches;
+    std::vector<cv::DMatch> invMatches;
 	for(size_t i = 0; i < matches.size(); i++)
 	{
-		DMatch m = matches.at(i);
-		DMatch im;
+        cv::DMatch m = matches.at(i);
+        cv::DMatch im;
 		im.distance = m.distance;
 		im.imgIdx = m.imgIdx;
 		im.queryIdx = m.trainIdx;
@@ -825,24 +764,21 @@ vector<DMatch> invertMatches(vector<DMatch> matches)
 	return invMatches;
 }
 
-vector<DMatch> Cluster_data::eliminateOutliers(vector<KeyPoint> points1, vector<KeyPoint> points2, double distThreshPercent, double distThreshModelPercent, double rotationThresh, double ScaleThresh, Mat image1, Mat image2, int extendedOutPut, int inv)
+std::vector<cv::DMatch> Cluster_data::eliminateOutliers(std::vector<cv::KeyPoint> points1, std::vector<cv::KeyPoint> points2, double distThreshPercent, double distThreshModelPercent, double rotationThresh, double ScaleThresh, cv::Mat image1, cv::Mat image2, int extendedOutPut, int inv)
 {
 	if(this->transfMat.size().width == 0)
 	{
-		vector<DMatch> el = this->matches;
-		this->matches = vector<DMatch>();
+        std::vector<cv::DMatch> el = this->matches;
+        this->matches = std::vector<cv::DMatch>();
 		return el;
 	}
-	Mat trMat;
+    cv::Mat trMat;
 	if(!inv)
-	{
 		trMat = this->transfMat;
-	}
 	else
-	{
 		invertAffineTransform(this->transfMat, trMat);
-	}
-	Mat rot, shear, scale;
+
+    cv::Mat rot, shear, scale;
 	double angle, Kscale, shiftX, shiftY;
 	double p = 0, r = 0;
 	decomposeAff(trMat, rot, shear, scale , angle, shiftX, shiftY, Kscale, p, r);
@@ -852,46 +788,43 @@ vector<DMatch> Cluster_data::eliminateOutliers(vector<KeyPoint> points1, vector<
 	double distanceMean = 0.;
 	int numberOfeliminatedPoints = 0;
 
-	vector<DMatch> eliminatedMatches;
-	vector<DMatch> clusterMatches;
-	vector<DMatch> afterElimination;
+    std::vector<cv::DMatch> eliminatedMatches;
+    std::vector<cv::DMatch> clusterMatches;
+    std::vector<cv::DMatch> afterElimination;
 	if(!inv)
-	{
 		clusterMatches = this->matches;
-	}
 	else
-	{
 		clusterMatches = invertMatches(this->matches);
-	}
+
 	for(unsigned int i = 0; i < clusterMatches.size(); i ++)
 	{
 		int indx1 = clusterMatches.at(i).queryIdx;
 		int indx2 = clusterMatches.at(i).trainIdx;
-		KeyPoint keyp1 = points1.at(indx1);
-		KeyPoint keyp2 = points2.at(indx2);
+        cv::KeyPoint keyp1 = points1.at(indx1);
+        cv::KeyPoint keyp2 = points2.at(indx2);
 
-		double MatchRotation = getMutualAngle(keyp1, keyp2);
-		double MatchScale = getMutualScale(keyp1, keyp2);
-		Point2f p1 = keyp1.pt;
-		Point2f p2 = keyp2.pt;
-		Point2f clusterPos = this->ClusterPosition(points1, points2);
-		Point2f ModelPoint = (clusterPos + keyp1.pt);
+        double MatchRotation = getMutualAngle(keyp1, keyp2);
+        double MatchScale = getMutualScale(keyp1, keyp2);
+        cv::Point2f p1 = keyp1.pt;
+        cv::Point2f p2 = keyp2.pt;
+        cv::Point2f clusterPos = this->ClusterPosition(points1, points2);
+        cv::Point2f ModelPoint = (clusterPos + keyp1.pt);
 		ModelPoint.x /= 2;
 		ModelPoint.y /= 2;
-		Point2f modelPosition_byPoint = predictModelPosition(keyp1, keyp2, ModelPoint);
-		Point2f modelPosition_byAff = WrapTransform(ModelPoint, trMat);
-		Point2f p1_ = WrapTransform(p1, trMat);
+        cv::Point2f modelPosition_byPoint = predictModelPosition(keyp1, keyp2, ModelPoint);
+        cv::Point2f modelPosition_byAff = WrapTransform(ModelPoint, trMat);
+        cv::Point2f p1_ = WrapTransform(p1, trMat);
 
 		double distanceProj = euclideanDistacne(p1_, p2);
 		double distanceModel = euclideanDistacne(modelPosition_byPoint, modelPosition_byAff);
 
-		double angleDev = fabs(MatchRotation - angle);
+        double angleDev = fabs(MatchRotation - angle);
 		angleDev = angleDev > 180 ? 360 - angleDev: angleDev;
-		double Proportion = max_(Kscale, MatchScale) / min_(Kscale, MatchScale);
+        double Proportion = max_(Kscale, MatchScale) / min_(Kscale, MatchScale);
 
 		double Model2PointDist = euclideanDistacne(modelPosition_byAff, p1_);
 
-		vector<Point2f> wrapped_points = getNewOutline_of_image(image1, trMat);
+        std::vector<cv::Point2f> wrapped_points = getNewOutline_of_image(image1, trMat);
 		double d1 = euclideanDistacne(wrapped_points.at(0), wrapped_points.at(2));
 		double d2 = euclideanDistacne(wrapped_points.at(1), wrapped_points.at(3));
 		double max_diag = d1 > d2 ? d1 : d2;
@@ -911,13 +844,11 @@ vector<DMatch> Cluster_data::eliminateOutliers(vector<KeyPoint> points1, vector<
 		{
 			afterElimination.push_back(clusterMatches.at(i));
 		}
-
 	}
 
 	if((double)(clusterMatches.size()) / this->init_size < 0.05)
-	{
-		clusterMatches = vector<DMatch>();
-	}
+        clusterMatches = std::vector<cv::DMatch>();
+
 	this->matches = afterElimination;
 	return eliminatedMatches;
 }

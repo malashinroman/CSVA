@@ -28,24 +28,13 @@ if (UNIX)
 endif (UNIX)
 
 
-
-#if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-#  add_compile_options(-fopenmp)
-#else ()
-#  #add_compile_options(-openmp)
-#endif()
-
-
-
-add_compile_options(-std=c++11)
 include_directories(${OpenCV_INCLUDE_DIRS})
 
-ADD_LIBRARY(csva_lib SHARED csva.h csva.cpp Cluster_data.cpp Cluster_data.h HoughList.cpp HoughList.h  
-matching_hough.cpp 
-matching_hough.h misc_functions.cpp misc_functions.h
-confidence_estimation.h
-confidence_estimation.cpp
-)
+ADD_LIBRARY(csva_lib SHARED csva.h csva.cpp Cluster_data.cpp Cluster_data.h HoughList.cpp HoughList.h
+                            matching_hough.cpp
+                            matching_hough.h misc_functions.cpp misc_functions.h
+                            confidence_estimation.h
+                            confidence_estimation.cpp)
 
 TARGET_LINK_LIBRARIES(csva_lib ${Boost_LIBRARIES} ${OpenCV_LIBS})
 #set(${PROJECT_NAME}_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/include
