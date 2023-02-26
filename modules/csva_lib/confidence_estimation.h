@@ -35,13 +35,11 @@ Permission is hereby granted, free of charge, to any person obtaining
 #include <stdlib.h>
 
 
-using namespace std;
-using namespace cv;
-std::array<double, 6> calculateConfidence(const Mat& PT, vector<DMatch>& matches, const vector<KeyPoint>& kpts1, const vector<KeyPoint>& kpts2, const Mat& im1, const Mat& im2,
-	const vector<DMatch>& excludedMatches, int type, double LoweProb = 0.008);
-double calculateConfidenceLowe(Mat im1, Mat im2, const vector<KeyPoint>& kpts1, const vector<KeyPoint>&  kpts2,
-	const vector<DMatch>& matches, Mat H, double p,
-	const vector<DMatch>& excludedMatches, int& n, int& k);
+std::array<double, 6> calculateConfidence(const cv::Mat& PT, std::vector<cv::DMatch>& matches, const std::vector<cv::KeyPoint>& kpts1, const std::vector<cv::KeyPoint>& kpts2, const cv::Mat& im1, const cv::Mat& im2,
+    const std::vector<cv::DMatch>& excludedMatches, int type, double LoweProb = 0.008);
+double calculateConfidenceLowe(cv::Mat im1, cv::Mat im2, const std::vector<cv::KeyPoint>& kpts1, const std::vector<cv::KeyPoint>&  kpts2,
+    const std::vector<cv::DMatch>& matches, cv::Mat H, double p,
+    const std::vector<cv::DMatch>& excludedMatches, int& n, int& k);
 double calcProbOfSuccess(int n, int k, double p);
-double calculateAverageProbabilityOfMatches(const vector<DMatch>& matches);
-double calculateProbOfrandomPickQualityMatches(vector<DMatch> all_matches, vector<DMatch> pickMatches, bool biggerIsGood);
+double calculateAverageProbabilityOfMatches(const std::vector<cv::DMatch>& matches);
+double calculateProbOfrandomPickQualityMatches(std::vector<cv::DMatch> all_matches, std::vector<cv::DMatch> pickMatches, bool biggerIsGood);

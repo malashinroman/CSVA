@@ -33,10 +33,6 @@ Permission is hereby granted, free of charge, to any person obtaining
 #include <stdio.h>
 #include <opencv2/core.hpp>
 
-using namespace cv;
-using namespace std;
-
-
 enum TransformType { HOMOGENOUS_TRANSFORM, AFFINE_TRANSFORM, 
 	SIMILARITY_TRANSFORM, SIMILARITY_RANSAC, OPENCV_HOMOGRAPHY_RANSAC,
 	OPENCV_HOMOGRAPHY_LMEDS, OPENCV_AFFINE, OPENCV_SIMILARITY};
@@ -49,27 +45,27 @@ public:
 	Cluster_data operator=(const Cluster_data& other);
 	Cluster_data() {position = cv::Point(0,0);};
 	int init_size;
-	~Cluster_data();
+    ~Cluster_data() = default;
 	int scaleBin;
 	int orBin;
 	int XBin;
 	int YBin;
-	Mat transfMat;
+    cv::Mat transfMat;
 
-	void exclude(DMatch match);
-    Mat fitModelParams(const vector<KeyPoint>& keypoints1, const vector<KeyPoint>& keypoints2,
+    void exclude(cv::DMatch match);
+    cv::Mat fitModelParams(const std::vector<cv::KeyPoint>& keypoints1, const std::vector<cv::KeyPoint>& keypoints2,
 		TransformType transfType, int extended_output,
-		Mat image1 = Mat(), Mat image2 = Mat(), 
+        cv::Mat image1 = cv::Mat(), cv::Mat image2 = cv::Mat(),
 		double inlier_dist = 0, int iter = 0, int hip_check = 0, double deleteThresh = 0.2);;
 
-	Mat fitModelParamsSimilarityRansac(const vector<KeyPoint>& keypoints1,
-		const vector<KeyPoint>& keypoints2,
-		const Mat& image1, const Mat& image2,
+    cv::Mat fitModelParamsSimilarityRansac(const std::vector<cv::KeyPoint>& keypoints1,
+        const std::vector<cv::KeyPoint>& keypoints2,
+        const cv::Mat& image1, const cv::Mat& image2,
 		int iterations, int hip_check, double model_distT, double AngleThresh, double ScaleThresh);
 	
-	vector<DMatch> eliminateOutliers(vector<KeyPoint> points1, vector<KeyPoint> points2, double distThreshPercent, double distThreshModelPercent, double rotationThresh, double ScaleThresh, Mat image1 = Mat(), Mat image2 = Mat(), int extendedOutPut = 0, int inv = 0);
+    std::vector<cv::DMatch> eliminateOutliers(std::vector<cv::KeyPoint> points1, std::vector<cv::KeyPoint> points2, double distThreshPercent, double distThreshModelPercent, double rotationThresh, double ScaleThresh, cv::Mat image1 = cv::Mat(), cv::Mat image2 = cv::Mat(), int extendedOutPut = 0, int inv = 0);
 	cv::Point2f position;
-	Point2f ClusterPosition(const vector<KeyPoint>& keypoints1, const vector<KeyPoint>& keypoints2);
+    cv::Point2f ClusterPosition(const std::vector<cv::KeyPoint>& keypoints1, const std::vector<cv::KeyPoint>& keypoints2);
 
 };
 

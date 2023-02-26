@@ -34,59 +34,56 @@ Permission is hereby granted, free of charge, to any person obtaining
 #include <stdio.h>
 #include <opencv2/core.hpp>
 
-using namespace cv;
-using namespace std;
-
 #define max_(a, b) ((a) > (b) ? (a) : (b))
 #define min_(a, b) ((a) < (b) ? (a) : (b))
 #define image_diag(image) sqrt((double)(image.size().width*image.size().width + image.size().height*image.size().height))
 
 
-template <typename T> string tostr(const T& t) { std::ostringstream os; os<<t; return os.str(); };
-void decomposeAff(const Mat& transfMat, Mat& Rot, Mat& Shear, Mat& Scale, double& Theta, double& shiftX, double& shiftY, double& scale, double& p, double& r);
+template <typename T> std::string tostr(const T& t) { std::ostringstream os; os<<t; return os.str(); };
+void decomposeAff(const cv::Mat& transfMat, cv::Mat& Rot, cv::Mat& Shear, cv::Mat& Scale, double& Theta, double& shiftX, double& shiftY, double& scale, double& p, double& r);
 
-void decomposeAffLutsiv(const Mat& transfMat, double* scale, double* theta, double* ascale, double* direction);
+void decomposeAffLutsiv(const cv::Mat& transfMat, double* scale, double* theta, double* ascale, double* direction);
 
-Rect getImageProjBbx(const Mat& image1, const Mat& trM);
-Point2f WrapTransform(Point2f SamplePoint, const Mat& trMatrix);
+cv::Rect getImageProjBbx(const cv::Mat& image1, const cv::Mat& trM);
+cv::Point2f WrapTransform(cv::Point2f SamplePoint, const cv::Mat& trMatrix);
 
-vector<Point2f> WrapTransform(vector<Point2f>& SamplePoint, const Mat& trMatrix);
+std::vector<cv::Point2f> WrapTransform(std::vector<cv::Point2f>& SamplePoint, const cv::Mat& trMatrix);
 
-double euclideanDistacne(Point2f p1, Point2f p2);
+double euclideanDistacne(cv::Point2f p1, cv::Point2f p2);
 
 double  convertOpencvAngle2GoodAngle(double angle_opencv);
 
-Point2f  predictModelPosition(const KeyPoint& point1, const KeyPoint& point2, Point2f ModelPoint);
+cv::Point2f  predictModelPosition(const cv::KeyPoint& point1, const cv::KeyPoint& point2, cv::Point2f ModelPoint);
 
-Point2f  predictModelPosition2(const KeyPoint& point1, const KeyPoint& point2, Point2f ModelPoint);
+cv::Point2f  predictModelPosition2(const cv::KeyPoint& point1, const cv::KeyPoint& point2, cv::Point2f ModelPoint);
 
-int independentMatches(vector<DMatch> matches, vector<KeyPoint> pts1, vector<KeyPoint> pts2, Mat im1, Mat im2);
+int independentMatches(std::vector<cv::DMatch> matches, std::vector<cv::KeyPoint> pts1, std::vector<cv::KeyPoint> pts2, cv::Mat im1, cv::Mat im2);
 
-bool checkMatchIn(vector<DMatch> matches, DMatch newm);
-bool checkMatchIn(vector<DMatch> matches, DMatch newm, int& indx);
-double matchDistance(const DMatch& m1, const DMatch& m2, const vector<KeyPoint>& pts1, const vector<KeyPoint>& pts2);
+bool checkMatchIn(std::vector<cv::DMatch> matches, cv::DMatch newm);
+bool checkMatchIn(std::vector<cv::DMatch> matches, cv::DMatch newm, int& indx);
+double matchDistance(const cv::DMatch& m1, const cv::DMatch& m2, const std::vector<cv::KeyPoint>& pts1, const std::vector<cv::KeyPoint>& pts2);
 
-double getMutualAngle(const KeyPoint& p1, const KeyPoint& p2);
+double getMutualAngle(const cv::KeyPoint& p1, const cv::KeyPoint& p2);
 double getAngleDif(double angle1, double angle2);
-double getMutualScale(const KeyPoint& p1, const KeyPoint& p2);
-void inline getMutualShifts(const KeyPoint& p1, const KeyPoint& p2, double& shiftx, double& shifty);
+double getMutualScale(const cv::KeyPoint& p1, const cv::KeyPoint& p2);
+void inline getMutualShifts(const cv::KeyPoint& p1, const cv::KeyPoint& p2, double& shiftx, double& shifty);
 
 
-void getMatchedKeypoints(const vector<DMatch>& matches,
-	const vector<KeyPoint>& keypoints1, const vector<KeyPoint>&  keypoints2,
-	vector<KeyPoint>& matchedkeypoints1, vector<KeyPoint>& matchedkeypoints2);
+void getMatchedKeypoints(const std::vector<cv::DMatch>& matches,
+    const std::vector<cv::KeyPoint>& keypoints1, const std::vector<cv::KeyPoint>&  keypoints2,
+    std::vector<cv::KeyPoint>& matchedkeypoints1, std::vector<cv::KeyPoint>& matchedkeypoints2);
 
-void sortMatchedKeypointsInQualityOrder(vector<DMatch>& matches, const vector<KeyPoint>& keypoints1, const vector<KeyPoint>& keypoints2, vector<KeyPoint>& matchedkeypoints1, vector<KeyPoint>& matchedkeypoints2);
+void sortMatchedKeypointsInQualityOrder(std::vector<cv::DMatch>& matches, const std::vector<cv::KeyPoint>& keypoints1, const std::vector<cv::KeyPoint>& keypoints2, std::vector<cv::KeyPoint>& matchedkeypoints1, std::vector<cv::KeyPoint>& matchedkeypoints2);
 
-void getScaleAndRotation(const Mat& transfMat, double& scale, double& angle);
+void getScaleAndRotation(const cv::Mat& transfMat, double& scale, double& angle);
 
-Mat FindTransformRansac(vector<KeyPoint> keypoints1, vector<KeyPoint> keypoints2, vector<DMatch> matches, int iterations, int PerspectiveTransform);
-vector<DMatch> excludeMany2OneMatches(const vector<DMatch>& matches, const vector<KeyPoint>& keypoints1, const vector<KeyPoint>& keypoints2);
-vector<DMatch> excludeOne2ManyMatches(const vector<DMatch>& matches, const vector<KeyPoint>& keypoints1, const vector<KeyPoint>& keypoints2);
-vector<DMatch> useNNratio(const vector<DMatch>&, double ratio);
+cv::Mat FindTransformRansac(std::vector<cv::KeyPoint> keypoints1, std::vector<cv::KeyPoint> keypoints2, std::vector<cv::DMatch> matches, int iterations, int PerspectiveTransform);
+std::vector<cv::DMatch> excludeMany2OneMatches(const std::vector<cv::DMatch>& matches, const std::vector<cv::KeyPoint>& keypoints1, const std::vector<cv::KeyPoint>& keypoints2);
+std::vector<cv::DMatch> excludeOne2ManyMatches(const std::vector<cv::DMatch>& matches, const std::vector<cv::KeyPoint>& keypoints1, const std::vector<cv::KeyPoint>& keypoints2);
+std::vector<cv::DMatch> useNNratio(const std::vector<cv::DMatch>&, double ratio);
 
-int findMatch(DMatch m, vector<DMatch> allmatches, int crossCheck);
+int findMatch(cv::DMatch m, std::vector<cv::DMatch> allmatches, int crossCheck);
 
-Mat AffineToHomography(Mat affine);
-double calculateNewImageSquare(cv::Size OriginalSize, Mat transform);
-vector<Point2f> getNewOutline_of_image(const Mat& image1, const Mat& Tr);
+cv::Mat AffineToHomography(cv::Mat affine);
+double calculateNewImageSquare(cv::Size OriginalSize, cv::Mat transform);
+std::vector<cv::Point2f> getNewOutline_of_image(const cv::Mat& image1, const cv::Mat& Tr);

@@ -44,66 +44,65 @@ Permission is hereby granted, free of charge, to any person obtaining
 #include <iostream>
 
 
-vector<Point2f> WrapTransform(vector<Point2f>& SamplePoints, const Mat& trMatrix)
+std::vector<cv::Point2f> WrapTransform(std::vector<cv::Point2f>& SamplePoints, const cv::Mat& trMatrix)
 {
-    vector<Point2f> wrappedPoints;
-    for(vector<Point2f>::iterator it = SamplePoints.begin(); it!= SamplePoints.end(); it++)
+    std::vector<cv::Point2f> wrappedPoints;
+    for(std::vector<cv::Point2f>::iterator it = SamplePoints.begin(); it!= SamplePoints.end(); it++)
     {
         wrappedPoints.push_back(WrapTransform(*it, trMatrix));
     }
     return wrappedPoints;
 }
 
-Rect getImageProjBbx(Mat image1, Mat trM)
+cv::Rect getImageProjBbx(cv::Mat image1, cv::Mat trM)
 {
-	vector<Point2f> showPoints;
-	showPoints.push_back(Point(0, 0));
-	showPoints.push_back(Point(image1.size().width, 0));
-	showPoints.push_back(Point(image1.size().width, image1.size().height));
-	showPoints.push_back(Point(0, image1.size().height));
-	showPoints.push_back(Point(image1.size().width / 2, image1.size().height / 2));
-	showPoints.push_back(Point(image1.size().width / 2, 0));
+    std::vector<cv::Point2f> showPoints;
+    showPoints.push_back(cv::Point(0, 0));
+    showPoints.push_back(cv::Point(image1.size().width, 0));
+    showPoints.push_back(cv::Point(image1.size().width, image1.size().height));
+    showPoints.push_back(cv::Point(0, image1.size().height));
+    showPoints.push_back(cv::Point(image1.size().width / 2, image1.size().height / 2));
+    showPoints.push_back(cv::Point(image1.size().width / 2, 0));
 
-	vector<Point2f> drawPoints = WrapTransform(showPoints, trM);
-	vector<float> xx;
-	vector<float> yy;
+    std::vector<cv::Point2f> drawPoints = WrapTransform(showPoints, trM);
+    std::vector<float> xx;
+    std::vector<float> yy;
 	for (int i = 0; i < 4; i++)
 	{
 		xx.push_back(drawPoints.at(i).x);
 		yy.push_back(drawPoints.at(i).y);
 	}
-	typedef vector<float>::const_iterator iterator;
-	pair< iterator, iterator > resultX = boost::minmax_element(xx.begin(), xx.end());
+    typedef std::vector<float>::const_iterator iterator;
+    std::pair< iterator, iterator > resultX = boost::minmax_element(xx.begin(), xx.end());
 	double xmin = *resultX.first;
 	double xmax = *resultX.second;
-	pair< iterator, iterator > resultY = boost::minmax_element(yy.begin(), yy.end());
+    std::pair< iterator, iterator > resultY = boost::minmax_element(yy.begin(), yy.end());
 	double ymin = *resultY.first;
 	double ymax = *resultY.second;
-	return Rect(int(xmin), int(ymin), int(xmax - xmin), int(ymax - ymin));
+    return cv::Rect(int(xmin), int(ymin), int(xmax - xmin), int(ymax - ymin));
 }
 
-Point2f WrapTransform(Point2f SamplePoint, const Mat& trMatrix)
+cv::Point2f WrapTransform(cv::Point2f SamplePoint, const cv::Mat& trMatrix)
 {
-    Mat p1(3,1, CV_64F);
+    cv::Mat p1(3,1, CV_64F);
     p1.at<double>(0) = SamplePoint.x;
     p1.at<double>(1) = SamplePoint.y;
     p1.at<double>(2) = 1.;
-    Mat Result = trMatrix * p1;
+    cv::Mat Result = trMatrix * p1;
     double r = 1;
     if(Result.size().height > 2)
-    {
         r = Result.at<double>(2);
-    }
-    Point2f np((float)(Result.at<double>(0) / r), (float)(Result.at<double>(1) / r));
+
+    cv::Point2f np((float)(Result.at<double>(0) / r), (float)(Result.at<double>(1) / r));
     return np;
 }
 
-double euclideanDistacne(Point2f p1, Point2f p2)
+double euclideanDistacne(cv::Point2f p1, cv::Point2f p2)
 {
     return sqrt((double)(p1.x - p2.x)*(p1.x - p2.x) + (p1.y - p2.y)*(p1.y - p2.y));
 }
 
-Point2f predictModelPosition2(const KeyPoint& point1, const KeyPoint& point2, Point2f ModelPoint)
+cv::Point2f predictModelPosition2(const cv::KeyPoint& point1, const cv::KeyPoint& point2, cv::Point2f ModelPoint)
 {
     double dx = ModelPoint.x - point1.pt.x;
     double dy = ModelPoint.y - point1.pt.y;
@@ -111,11 +110,11 @@ Point2f predictModelPosition2(const KeyPoint& point1, const KeyPoint& point2, Po
     double ang2 = convertOpencvAngle2GoodAngle(point2.angle);
     double ang = ang2 - ang1;
     ang = ang / 180. * CV_PI;
-    Point2f IP;
+    cv::Point2f IP;
     double MutualScale = point2.size / point1.size;
     IP.x = (float)(dx*MutualScale);
     IP.y = (float)(dy*MutualScale);
-    Point2f modelLoc;
+    cv::Point2f modelLoc;
     modelLoc.x = point2.pt.x + (float)(cos(ang)*IP.x - sin(ang)*IP.y);
     modelLoc.y = point2.pt.y + (float)(sin(ang)*IP.x + cos(ang)*IP.y);
     return modelLoc;
@@ -126,11 +125,10 @@ Point2f predictModelPosition2(const KeyPoint& point1, const KeyPoint& point2, Po
 *	this transform.
 *	Matches of every cluster should predict nearly the same model position
 */
-Point2f predictModelPosition(const KeyPoint& point1, const KeyPoint& point2, Point2f ModelPoint)
+cv::Point2f predictModelPosition(const cv::KeyPoint& point1, const cv::KeyPoint& point2, cv::Point2f ModelPoint)
 {
-
-    Point2f p1 = point1.pt;
-    Point2f p2 = point2.pt;
+    cv::Point2f p1 = point1.pt;
+    cv::Point2f p2 = point2.pt;
     double angle1 = convertOpencvAngle2GoodAngle(point1.angle);
     double angle2 = convertOpencvAngle2GoodAngle(point2.angle);
 
@@ -163,7 +161,7 @@ Point2f predictModelPosition(const KeyPoint& point1, const KeyPoint& point2, Poi
     double u = x*S*cos(-a) - y*S*sin(-a) + tx;
     double v = x*S*sin(-a) + y*S*cos(-a) + ty;
 
-    return Point2d(u, v);
+    return cv::Point2d(u, v);
 }
 
 /*
@@ -189,16 +187,16 @@ double convertOpencvAngle2GoodAngle(double angle_opencv)
     return goodAngle;
 }
 
-int independentMatches(vector<DMatch> matches, vector<KeyPoint> pts1, vector<KeyPoint> pts2, Mat im1, Mat im2)
+int independentMatches(std::vector<cv::DMatch> matches, std::vector<cv::KeyPoint> pts1, std::vector<cv::KeyPoint> pts2, cv::Mat im1, cv::Mat im2)
 {
     int size = matches.size();
-    vector<DMatch> copy(matches);
+    std::vector<cv::DMatch> copy(matches);
     for(unsigned int i = 0; i < copy.size(); i++)
     {
-        DMatch cmatch = copy.at(i);
+        cv::DMatch cmatch = copy.at(i);
         for(unsigned int j = i + 1; j < copy.size(); j++)
         {
-            DMatch checkm = copy.at(j);
+            cv::DMatch checkm = copy.at(j);
             double dist = matchDistance(cmatch, checkm, pts1, pts2);
             if(dist < 10)
             {
@@ -209,29 +207,27 @@ int independentMatches(vector<DMatch> matches, vector<KeyPoint> pts1, vector<Key
         }
 
     }
-    matches = vector<DMatch>(copy);
+    matches = std::vector<cv::DMatch>(copy);
     return copy.size();
 }
 
-bool checkMatchIn(vector<DMatch> matches, DMatch newm)
+bool checkMatchIn(std::vector<cv::DMatch> matches, cv::DMatch newm)
 {
     bool retval = false;
-    for(vector<DMatch>::iterator it = matches.begin(); it!=matches.end(); it++)
+    for(std::vector<cv::DMatch>::iterator it = matches.begin(); it!=matches.end(); it++)
     {
         if(it->queryIdx == newm.queryIdx && it->trainIdx == newm.trainIdx)
-        {
             retval = true;
-        }
     }
     return retval;
 }
 
-bool checkMatchIn(vector<DMatch> matches, DMatch newm, int& indx)
+bool checkMatchIn(std::vector<cv::DMatch> matches, cv::DMatch newm, int& indx)
 {
     bool retval = false;
     int num = 0;
     indx = -1;
-    for(vector<DMatch>::iterator it = matches.begin(); it!=matches.end(); it++)
+    for(std::vector<cv::DMatch>::iterator it = matches.begin(); it!=matches.end(); it++)
     {
         if(it->queryIdx == newm.queryIdx && it->trainIdx == newm.trainIdx)
         {
@@ -244,20 +240,20 @@ bool checkMatchIn(vector<DMatch> matches, DMatch newm, int& indx)
 }
 
 
-double inline matchDistance(const DMatch& m1, const DMatch& m2, const vector<KeyPoint>& pts1, const vector<KeyPoint>& pts2)
+double inline matchDistance(const cv::DMatch& m1, const cv::DMatch& m2, const std::vector<cv::KeyPoint>& pts1, const std::vector<cv::KeyPoint>& pts2)
 {
-    Point2f m1p1 = pts1.at(m1.queryIdx).pt;
-    Point2f m1p2 = pts2.at(m1.trainIdx).pt;
+    cv::Point2f m1p1 = pts1.at(m1.queryIdx).pt;
+    cv::Point2f m1p2 = pts2.at(m1.trainIdx).pt;
 
-    Point2f m2p1 = pts1.at(m2.queryIdx).pt;
-    Point2f m2p2 = pts2.at(m2.trainIdx).pt;
+    cv::Point2f m2p1 = pts1.at(m2.queryIdx).pt;
+    cv::Point2f m2p2 = pts2.at(m2.trainIdx).pt;
 
     double dist1 = euclideanDistacne(m1p1, m2p1);
     double dist2 = euclideanDistacne(m1p2, m2p2);
     return dist1 < dist2 ? dist1 : dist2;
 }
 
-void decomposeAffLutsiv(const Mat&  transfMat, double* scale, double* theta, double* ascale, double* direction)
+void decomposeAffLutsiv(const cv::Mat&  transfMat, double* scale, double* theta, double* ascale, double* direction)
 {
     double a1 = transfMat.at<double>(0,0);
     double a2 = transfMat.at<double>(0,1);
@@ -282,7 +278,7 @@ void decomposeAffLutsiv(const Mat&  transfMat, double* scale, double* theta, dou
 }
 
 
-void decomposeAff(const Mat& transfMat, Mat& Rot, Mat& Shear, Mat& Scale, double& Theta, double& shiftX, double& shiftY, double& scale, double& p, double& r)
+void decomposeAff(const cv::Mat& transfMat, cv::Mat& Rot, cv::Mat& Shear, cv::Mat& Scale, double& Theta, double& shiftX, double& shiftY, double& scale, double& p, double& r)
 {
     double a = transfMat.at<double>(0,0);
     double b = transfMat.at<double>(0,1);
@@ -292,9 +288,9 @@ void decomposeAff(const Mat& transfMat, Mat& Rot, Mat& Shear, Mat& Scale, double
     double e = transfMat.at<double>(1,1);
     double f = transfMat.at<double>(1,2);
 
-    Rot = Mat::zeros(Size(2,2), CV_64F);
-    Shear = Mat::zeros(Size(2,2), CV_64F);
-    Scale = Mat::zeros(Size(2,2), CV_64F);
+    Rot = cv::Mat::zeros(cv::Size(2,2), CV_64F);
+    Shear = cv::Mat::zeros(cv::Size(2,2), CV_64F);
+    Scale = cv::Mat::zeros(cv::Size(2,2), CV_64F);
 
     shiftX = c;
     shiftY = f;
@@ -321,9 +317,9 @@ void decomposeAff(const Mat& transfMat, Mat& Rot, Mat& Shear, Mat& Scale, double
     Theta < 0 ? Theta + 360: Theta;
 }
 
-void getScaleAndRotation(const Mat& transfMat, double& scale, double& angle)
+void getScaleAndRotation(const cv::Mat& transfMat, double& scale, double& angle)
 {
-    Mat Scale, Shear, Rot;
+    cv::Mat Scale, Shear, Rot;
     double shiftx, shifty, p, r;
     decomposeAff(transfMat, Rot, Shear, Scale, angle, shiftx, shifty, scale, p, r);
 }
@@ -332,20 +328,17 @@ void getScaleAndRotation(const Mat& transfMat, double& scale, double& angle)
 *
 *	[-180, 180]
 */
-double getMutualAngle(const KeyPoint& p1, const KeyPoint& p2)
+double getMutualAngle(const cv::KeyPoint& p1, const cv::KeyPoint& p2)
 {
     double a1 = convertOpencvAngle2GoodAngle(p1.angle);
     double a2 = convertOpencvAngle2GoodAngle(p2.angle);
     double dif = a2 - a1;
     double mangle = dif;
     if(dif > 180)
-    {
         mangle = mangle - 360;
-    }
     if(dif < -180)
-    {
         mangle = 360 + mangle;
-    }
+
     return mangle;
 }
 
@@ -357,17 +350,14 @@ double getAngleDif(double angle1, double angle2)
 {
 	double dif = angle1 - angle2;
 	if(dif > 180)
-	{
 		dif = dif - 360;
-	}
 	if(dif < -180)
-	{
 		dif = 360 + dif;
-	}
+
 	return dif;
 }
 
-double getMutualScale(const KeyPoint& p1, const KeyPoint& p2)
+double getMutualScale(const cv::KeyPoint& p1, const cv::KeyPoint& p2)
 {
     double size1 = p1.size;
     double size2 = p2.size;
@@ -377,21 +367,21 @@ double getMutualScale(const KeyPoint& p1, const KeyPoint& p2)
     return ScaleK;
 }
 
-void getMutualShifts(const KeyPoint& p1, const KeyPoint& p2, double& shiftx, double& shifty)
+void getMutualShifts(const cv::KeyPoint& p1, const cv::KeyPoint& p2, double& shiftx, double& shifty)
 {
     shiftx = p2.pt.x - p1.pt.x;
     shifty = p2.pt.y - p1.pt.y;
 }
 
-void sortMatchedKeypointsInQualityOrder(vector<DMatch>&  matches, const vector<KeyPoint>& keypoints1, const vector<KeyPoint>& keypoints2, vector<KeyPoint>& matchedkeypoints1, vector<KeyPoint>& matchedkeypoints2)
+void sortMatchedKeypointsInQualityOrder(std::vector<cv::DMatch>&  matches, const std::vector<cv::KeyPoint>& keypoints1, const std::vector<cv::KeyPoint>& keypoints2, std::vector<cv::KeyPoint>& matchedkeypoints1, std::vector<cv::KeyPoint>& matchedkeypoints2)
 {
-	std::sort(matches.begin(), matches.end(), [](const DMatch& m1, const DMatch& m2) {return m1.distance < m2.distance; });
+    std::sort(matches.begin(), matches.end(), [](const cv::DMatch& m1, const cv::DMatch& m2) {return m1.distance < m2.distance; });
 	return getMatchedKeypoints(matches, keypoints1, keypoints2, matchedkeypoints1, matchedkeypoints2);
 }
 
-void getMatchedKeypoints(const vector<DMatch>& matches,
-	const vector<KeyPoint>&  keypoints1, const vector<KeyPoint>&  keypoints2,
-	vector<KeyPoint>& matchedkeypoints1, vector<KeyPoint>& matchedkeypoints2)
+void getMatchedKeypoints(const std::vector<cv::DMatch>& matches,
+    const std::vector<cv::KeyPoint>&  keypoints1, const std::vector<cv::KeyPoint>&  keypoints2,
+    std::vector<cv::KeyPoint>& matchedkeypoints1, std::vector<cv::KeyPoint>& matchedkeypoints2)
 {
 	for (unsigned int i = 0; i < matches.size(); i++)
 	{
@@ -399,12 +389,12 @@ void getMatchedKeypoints(const vector<DMatch>& matches,
 		matchedkeypoints2.push_back(keypoints2.at(matches.at(i).trainIdx));
 	}
 }
-vector<DMatch> excludeMany2OneMatches(const vector<DMatch>& matches, const vector<KeyPoint>& keypoints1, const vector<KeyPoint>& keypoints2)
+std::vector<cv::DMatch> excludeMany2OneMatches(const std::vector<cv::DMatch>& matches, const std::vector<cv::KeyPoint>& keypoints1, const std::vector<cv::KeyPoint>& keypoints2)
 {
     int* ind = (int*)malloc(sizeof(int) * keypoints2.size());
 
-    DMatch* matches_link = (DMatch*)malloc(sizeof(DMatch) * keypoints2.size());
-    vector<DMatch> excluded_matches;
+    cv::DMatch* matches_link = (cv::DMatch*)malloc(sizeof(cv::DMatch) * keypoints2.size());
+    std::vector<cv::DMatch> excluded_matches;
     for(size_t i = 0; i < keypoints2.size(); i++)
     {
         ind[i] = -1;
@@ -428,24 +418,22 @@ vector<DMatch> excludeMany2OneMatches(const vector<DMatch>& matches, const vecto
             }
         }
     }
-    vector<DMatch> newmatches;
+    std::vector<cv::DMatch> newmatches;
     for(size_t i =0; i < keypoints2.size(); i++)
     {
         if(ind[i] > -1)
-        {
             newmatches.push_back(matches_link[i]);
-        }
     }
     free(ind);
     free(matches_link);
     return newmatches;
 }
 
-vector<DMatch> excludeOne2ManyMatches(const vector<DMatch>& matches, const vector<KeyPoint>& keypoints1, const vector<KeyPoint>& keypoints2)
+std::vector<cv::DMatch> excludeOne2ManyMatches(const std::vector<cv::DMatch>& matches, const std::vector<cv::KeyPoint>& keypoints1, const std::vector<cv::KeyPoint>& keypoints2)
 {
     int* ind = (int*)malloc(sizeof(int) * keypoints1.size());
-    DMatch* matches_link = (DMatch*)malloc(sizeof(DMatch) * keypoints1.size());
-    vector<DMatch> excluded_matches;
+    cv::DMatch* matches_link = (cv::DMatch*)malloc(sizeof(cv::DMatch) * keypoints1.size());
+    std::vector<cv::DMatch> excluded_matches;
     for(size_t i = 0; i < keypoints1.size(); i++)
     {
         ind[i] = -1;
@@ -469,20 +457,18 @@ vector<DMatch> excludeOne2ManyMatches(const vector<DMatch>& matches, const vecto
             }
         }
     }
-    vector<DMatch> newmatches;
+    std::vector<cv::DMatch> newmatches;
     for(size_t i =0; i < keypoints1.size(); i++)
     {
         if(ind[i] > -1)
-        {
             newmatches.push_back(matches_link[i]);
-        }
     }
     free(ind);
     free(matches_link);
     return newmatches;
 }
 
-int findMatch(const DMatch& m, const vector<DMatch>& allmatches, int crossCheck)
+int findMatch(const cv::DMatch& m, const std::vector<cv::DMatch>& allmatches, int crossCheck)
 {
     for(size_t i = 0; i < allmatches.size(); i++)
     {
@@ -493,41 +479,33 @@ int findMatch(const DMatch& m, const vector<DMatch>& allmatches, int crossCheck)
             int train1 = allmatches.at(i).trainIdx;
             int train2 = m.queryIdx;
             if((allmatches.at(i).trainIdx == m.queryIdx) && (allmatches.at(i).queryIdx == m.trainIdx))
-            {
                 return i;
-            }
+
             if((train1 == train2) && (quer1 == quer2))
-            {
                 int justflag = 0;
-            }
         }
         else
         {
             if((allmatches.at(i).queryIdx == m.queryIdx) && (allmatches.at(i).trainIdx == m.trainIdx))
-            {
                 return i;
-            }
         }
-
     }
     return -1;
 }
 
-vector<DMatch> useNNratio(const vector<DMatch>& matches, double ratio)
+std::vector<cv::DMatch> useNNratio(const std::vector<cv::DMatch>& matches, double ratio)
 {
-    vector<DMatch> outMatches;
+    std::vector<cv::DMatch> outMatches;
     for(size_t i = 0; i < matches.size(); i++)
     {
-        DMatch m = matches.at(i);
+        cv::DMatch m = matches.at(i);
         if(m.distance < ratio)
-        {
             outMatches.push_back(m);
-        }
     }
     return outMatches;
 }
 
-float angleBetweenLines(const Point &v1, const Point &v2)
+float angleBetweenLines(const cv::Point &v1, const cv::Point &v2)
 {
 	float len1 = float(sqrt(v1.x * v1.x + v1.y * v1.y));
 	float len2 = float(sqrt(v2.x * v2.x + v2.y * v2.y));
@@ -544,42 +522,41 @@ float angleBetweenLines(const Point &v1, const Point &v2)
 		return acos(a); // 0..PI
 }
 
-double calculateNewImageSquare(const cv::Size& OriginalSize, const Mat& transform)
+double calculateNewImageSquare(const cv::Size& OriginalSize, const cv::Mat& transform)
 {
 	float height =float( OriginalSize.height);
 	float width = float(OriginalSize.width);
-	vector<Point2f> points;
-	points.push_back(Point2f(0, 0));
-	points.push_back(Point2f(width, 0));
-	points.push_back(Point2f(width, height));
-	points.push_back(Point2f(0, height));
-	vector<Point2f> wrapped_points = WrapTransform(points, transform);
+    std::vector<cv::Point2f> points;
+    points.push_back(cv::Point2f(0, 0));
+    points.push_back(cv::Point2f(width, 0));
+    points.push_back(cv::Point2f(width, height));
+    points.push_back(cv::Point2f(0, height));
+    std::vector<cv::Point2f> wrapped_points = WrapTransform(points, transform);
 	double d1 = euclideanDistacne(wrapped_points.at(0), wrapped_points.at(2));
 	double d2 = euclideanDistacne(wrapped_points.at(1), wrapped_points.at(3));
-	Point v1 = wrapped_points.at(0) - wrapped_points.at(2);
-	Point v2 = wrapped_points.at(1) - wrapped_points.at(3);
+    cv::Point v1 = wrapped_points.at(0) - wrapped_points.at(2);
+    cv::Point v2 = wrapped_points.at(1) - wrapped_points.at(3);
 	double a = angleBetweenLines(v1, v2);
 	double S = 0.5 * sin(a) * d1 * d2;
 	return S;
 }
 
-
-vector<Point2f> getNewOutline_of_image(const Mat& image, const Mat& Tr)
+std::vector<cv::Point2f> getNewOutline_of_image(const cv::Mat& image, const cv::Mat& Tr)
 {
 	float height = float(image.size().height);
 	float width = float(image.size().width);
-	vector<Point2f> points;
-	points.push_back(Point2f(0, 0));
-	points.push_back(Point2f(width, 0));
-	points.push_back(Point2f(width, height));
-	points.push_back(Point2f(0, height));
-	vector<Point2f> wrapped_points = WrapTransform(points, Tr);
+    std::vector<cv::Point2f> points;
+    points.push_back(cv::Point2f(0, 0));
+    points.push_back(cv::Point2f(width, 0));
+    points.push_back(cv::Point2f(width, height));
+    points.push_back(cv::Point2f(0, height));
+    std::vector<cv::Point2f> wrapped_points = WrapTransform(points, Tr);
 	return wrapped_points;
 }
 
-Mat AffineToHomography(Mat affine)
+cv::Mat AffineToHomography(cv::Mat affine)
 {
-	Mat PT = cv::Mat(3, 3, CV_64F);
+    cv::Mat PT(3, 3, CV_64F);
 	PT.at<double>(0, 0) = affine.at<double>(0, 0);
 	PT.at<double>(0, 1) = affine.at<double>(0, 1);
 	PT.at<double>(1, 0) = affine.at<double>(1, 0);

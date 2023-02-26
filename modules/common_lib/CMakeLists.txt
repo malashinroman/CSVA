@@ -16,11 +16,6 @@ if (WIN32)
 	# message(${Boost_LIBRARY_DIR})
 endif (WIN32)
 
-add_compile_options(-std=c++11)
-if (UNIX)
-   add_compile_options(-fPIC)
-endif (UNIX)
-
 include_directories(${OpenCV_INCLUDE_DIRS})
 ADD_LIBRARY(common_lib  feature_extractors.h feature_extractors.cpp)
 TARGET_LINK_LIBRARIES(common_lib  ${Boost_LIBRARIES} ${OpenCV_LIBS})

@@ -38,19 +38,16 @@ Permission is hereby granted, free of charge, to any person obtaining
 #include <iostream>     // std::cout
 #include <algorithm>    // std::sort
 #include <vector>       // std::vector
-//#include "statistics.h"
-#include <omp.h>
+
 #include <opencv2/videostab/global_motion.hpp>
 #include <opencv2/videostab/stabilizer.hpp>
-using namespace cv;
-using namespace std;
 
 /*
 * ---------------------------
 * Core Functions
 * ---------------------------
 */
-Hough_Transform::Hough_Transform(double BinOrSize, double BinXSize, double BinYSize, double BinScFactor, Mat image1, Mat image2/*, HoughAccHashType hashtype*/)
+Hough_Transform::Hough_Transform(double BinOrSize, double BinXSize, double BinYSize, double BinScFactor, cv::Mat image1, cv::Mat image2/*, HoughAccHashType hashtype*/)
 {
 	this->image1 = image1.clone();
 	this->image2 = image2.clone();
@@ -81,11 +78,11 @@ Hough_Transform::~Hough_Transform()
 }
 void Hough_Transform::excludeDuplicates()
 {
-	for (vector<Cluster_data>::iterator itc = this->clusters.begin(); this->clusters.end() != itc; itc++)
+    for (std::vector<Cluster_data>::iterator itc = this->clusters.begin(); this->clusters.end() != itc; itc++)
 	{
-		for (vector<DMatch>::iterator itm = itc->matches.begin(); itm != itc->matches.end(); itm++)
+        for (std::vector<cv::DMatch>::iterator itm = itc->matches.begin(); itm != itc->matches.end(); itm++)
 		{
-			for (vector<Cluster_data>::iterator itc_next = itc + 1; this->clusters.end() != itc_next; itc_next++)
+            for (std::vector<Cluster_data>::iterator itc_next = itc + 1; this->clusters.end() != itc_next; itc_next++)
 			{
 				itc_next->exclude(*(itm));
 			}
@@ -123,23 +120,22 @@ void Hough_Transform::ExcludeMany2OneFromClusters()
 		this->clusters.at(i).matches = excludeMany2OneMatches(this->clusters.at(i).matches, this->keypoints1, this->keypoints2);
 	}
 }
-vector<DMatch> Hough_Transform::getAllClusterMatches()
+
+std::vector<cv::DMatch> Hough_Transform::getAllClusterMatches()
 {
-	vector<DMatch> allmatches;
-	for (vector<Cluster_data>::iterator itc = this->clusters.begin(); itc != this->clusters.end(); itc++)
+    std::vector<cv::DMatch> allmatches;
+    for (std::vector<Cluster_data>::iterator itc = this->clusters.begin(); itc != this->clusters.end(); itc++)
 	{
-		for (vector<DMatch>::iterator itMatches = itc->matches.begin(); itMatches != itc->matches.end(); itMatches++)
+        for (std::vector<cv::DMatch>::iterator itMatches = itc->matches.begin(); itMatches != itc->matches.end(); itMatches++)
 		{
 			if (!checkMatchIn(allmatches, *(itMatches)))
-			{
 				allmatches.push_back(*(itMatches));
-			}
 		}
 	}
 	return allmatches;
 }
 
-void Hough_Transform::FillAccNewBoundary2(vector<KeyPoint> points1, vector<KeyPoint> points2, vector<DMatch> matches, int ShiftAcc)
+void Hough_Transform::FillAccNewBoundary2(std::vector<cv::KeyPoint> points1, std::vector<cv::KeyPoint> points2, std::vector<cv::DMatch> matches, int ShiftAcc)
 {
 	this->allmatches = matches;
 	this->keypoints1 = points1;
@@ -156,9 +152,9 @@ void Hough_Transform::FillAccNewBoundary2(vector<KeyPoint> points1, vector<KeyPo
 		int indx1 = matches.at(i).queryIdx;
 		int indx2 = matches.at(i).trainIdx;
 
-		KeyPoint keyp1 = points1.at(indx1);
-		KeyPoint keyp2 = points2.at(indx2);
-		Point2d modelLoc;
+        cv::KeyPoint keyp1 = points1.at(indx1);
+        cv::KeyPoint keyp2 = points2.at(indx2);
+        cv::Point2d modelLoc;
 		int bina = 0;
 		int binx = 0;
 		int biny = 0;
@@ -177,7 +173,7 @@ void Hough_Transform::FillAccNewBoundary2(vector<KeyPoint> points1, vector<KeyPo
 		bins = int(ScaleBin);
 
 		// We assume model position in the center of the image
-		Point2d im1C(ImWidth / 2, ImHeight / 2);
+        cv::Point2d im1C(ImWidth / 2, ImHeight / 2);
 		modelLoc = predictModelPosition(keyp1, keyp2, im1C);
 
 
@@ -195,12 +191,12 @@ void Hough_Transform::FillAccNewBoundary2(vector<KeyPoint> points1, vector<KeyPo
 		binx = (int)(shiftx / curBinXsize);
 		biny = (int)(shifty / curBinYsize);
 
-		DMatch m = matches.at(i);
+        cv::DMatch m = matches.at(i);
 		houghListCpp.AddMatch(m, binx, biny, bina, bins);
 	}
 }
 
-void Hough_Transform::FillAccNewBoundary(vector<KeyPoint> points1, vector<KeyPoint> points2, vector<DMatch> matches, int ShiftAcc)
+void Hough_Transform::FillAccNewBoundary(std::vector<cv::KeyPoint> points1, std::vector<cv::KeyPoint> points2, std::vector<cv::DMatch> matches, int ShiftAcc)
 {
 	this->allmatches = matches;
 	this->keypoints1 = points1;
@@ -218,9 +214,9 @@ void Hough_Transform::FillAccNewBoundary(vector<KeyPoint> points1, vector<KeyPoi
 		int indx1 = matches.at(i).queryIdx;
 		int indx2 = matches.at(i).trainIdx;
 
-		KeyPoint keyp1 = points1.at(indx1);
-		KeyPoint keyp2 = points2.at(indx2);
-		Point2d modelLoc;
+        cv::KeyPoint keyp1 = points1.at(indx1);
+        cv::KeyPoint keyp2 = points2.at(indx2);
+        cv::Point2d modelLoc;
 		int bina = 0;
 		int binx = 0;
 		int biny = 0;
@@ -248,7 +244,7 @@ void Hough_Transform::FillAccNewBoundary(vector<KeyPoint> points1, vector<KeyPoi
 		/*int bins0 =  cvRound(log(MutualScale)); */
 		//double corr = cvRound(ScaleF) - ScaleF;
 		// We assume model position in the center of the image
-		Point2d im1C(ImWidth / 2, ImHeight / 2);
+        cv::Point2d im1C(ImWidth / 2, ImHeight / 2);
 		modelLoc = predictModelPosition(keyp1, keyp2, im1C);
 		double shiftx = modelLoc.x + deltaX;
 		double shifty = modelLoc.y + deltaY;
@@ -256,18 +252,18 @@ void Hough_Transform::FillAccNewBoundary(vector<KeyPoint> points1, vector<KeyPoi
 		biny = (int)(shifty / this->BinYSize);
 		//int binx0 = (int)(modelLoc.x / this->BinXSize);
 		//int biny0 = (int)(modelLoc.y / this->BinXSize);
-		DMatch m = matches.at(i);
+        cv::DMatch m = matches.at(i);
 		houghListCpp.AddMatch(m, binx, biny, bina, bins);
 	}
 }
 
-void Hough_Transform::FillAcc(vector<KeyPoint> points1, vector<KeyPoint> points2, vector<DMatch> matches)
+void Hough_Transform::FillAcc(std::vector<cv::KeyPoint> points1, std::vector<cv::KeyPoint> points2, std::vector<cv::DMatch> matches)
 {
 	this->allmatches = matches;
 	this->keypoints1 = points1;
 	this->keypoints2 = points2;
-	vector<DMatch>::iterator it;
-	//Mat imagePosAcc = Mat::zeros(this->image1.size(), CV_8U);
+    std::vector<cv::DMatch>::iterator it;
+    //Mat imagePosAcc = cv::Mat::zeros(this->image1.size(), CV_8U);
 	int numberOfPoint = 0;
 	//int i;
 	//printf("Accumulating matches\n");
@@ -278,9 +274,9 @@ void Hough_Transform::FillAcc(vector<KeyPoint> points1, vector<KeyPoint> points2
 		int indx1 = matches.at(i).queryIdx;
 		int indx2 = matches.at(i).trainIdx;
 
-		KeyPoint keyp1 = points1.at(indx1);
-		KeyPoint keyp2 = points2.at(indx2);
-		Point2d modelLoc;
+        cv::KeyPoint keyp1 = points1.at(indx1);
+        cv::KeyPoint keyp2 = points2.at(indx2);
+        cv::Point2d modelLoc;
 		int bina = 0, bina2 = 0;
 		int binx = 0, binx2 = 0;
 		int biny = 0, biny2 = 0;
@@ -300,13 +296,10 @@ void Hough_Transform::FillAcc(vector<KeyPoint> points1, vector<KeyPoint> points2
 		double deltaA = (ang / this->BinOrSize - bina - 0.5);
 		bina2 = deltaA > 0. ? bina + 1 : bina - 1;
 		if (bina2 < 0)
-		{
 			bina2 += this->NumOrBin;
-		}
 		if (bina2 == this->NumOrBin)
-		{
 			bina2 = 0;
-		}
+
 		double MutualScale = keyp2.size / keyp1.size;
 
 		double ScaleBin = log(MutualScale) / log(this->BinScFactor);
@@ -319,7 +312,7 @@ void Hough_Transform::FillAcc(vector<KeyPoint> points1, vector<KeyPoint> points2
 		bins2 = (corr > 0) ? bins - 1 : bins + 1;
 
 		// We assume model position in the center of the image
-		Point2d im1C(ImWidth / 2, ImHeight / 2);
+        cv::Point2d im1C(ImWidth / 2, ImHeight / 2);
 
 		modelLoc = predictModelPosition(keyp1, keyp2, im1C);
 
@@ -331,15 +324,8 @@ void Hough_Transform::FillAcc(vector<KeyPoint> points1, vector<KeyPoint> points2
 		float curBinXsize = float(this->BinXSize * mscale);
 		float curBinYsize = float(this->BinYSize * mscale);
 
-		//float curBinXsize = this->BinXSize;
-		//float curBinYsize = this->BinYSize;
-
-
 		binx = (int)(shiftx / curBinXsize); //
 		biny = (int)(shifty / curBinYsize); //
-
-		//binx = (int)(shiftx / ((this->BinXSize) / )); //
-		//biny = (int)(shifty / ((this->BinYSize) / )); //
 
 		//! vote in neighbour bin for current scale
 		double deltaX = shiftx / curBinXsize - binx - 0.5;
@@ -347,15 +333,9 @@ void Hough_Transform::FillAcc(vector<KeyPoint> points1, vector<KeyPoint> points2
 		//deltaX = fabs(deltaX);
 		double deltaY = shifty / curBinYsize - biny - 0.5;
 		biny2 = deltaY > 0.0 ? biny + 1 : biny - 1;
-		//deltaY = fabs(deltaY);
-
 
 		/*we have different cells for different scale*/
 		double mscale2 = pow(this->BinScFactor, bins2);
-		/*float curBinXsize2 = this->BinXSize;
-		float curBinYsize2 = this->BinYSize;*/
-		/*float curBinXsize2 = this->BinXSize / mscale2;
-		float curBinYsize2 = this->BinYSize / mscale2;*/
 
 		float curBinXsize2 = float(this->BinXSize * mscale2);
 		float curBinYsize2 = float(this->BinYSize * mscale2);
@@ -366,12 +346,9 @@ void Hough_Transform::FillAcc(vector<KeyPoint> points1, vector<KeyPoint> points2
 
 		double deltaX_s2 = shiftx / curBinXsize2 - binx_s2 - 0.5;
 		binx2_s2 = deltaX_s2 > 0.0 ? binx_s2 + 1 : binx_s2 - 1;
-		//deltaX_s2 = fabs(deltaX_s2);
 
 		double deltaY_s2 = shifty / curBinYsize2 - biny_s2 - 0.5;
 		biny2_s2 = deltaY_s2 > 0.0 ? biny_s2 + 1 : biny_s2 - 1;
-		//deltaY_s2 = fabs(deltaY_s2);
-
 
 		int bina_[2];
 		int bins_[2];
@@ -401,7 +378,7 @@ void Hough_Transform::FillAcc(vector<KeyPoint> points1, vector<KeyPoint> points2
 			int n2 = (k >> 1) % 2;
 			int n3 = (k >> 2) % 2;
 			int n4 = (k >> 3) % 2;
-			DMatch m = matches.at(i);
+            cv::DMatch m = matches.at(i);
 			int x = binx_[n4];
 			int y = biny_[n3];
 			int a = bina_[n1];
@@ -414,7 +391,6 @@ void Hough_Transform::FillAcc(vector<KeyPoint> points1, vector<KeyPoint> points2
 			houghListCpp.AddMatch(m, x, y, a, s);
 		}
 	}
-
 }
 
 Cluster_data Hough_Transform::MaxCluster()
@@ -461,11 +437,6 @@ void Hough_Transform::FindClusters(int voteThresh)
 			NewCData.matches = kv.second;
 			NewCData.init_size = NewCData.matches.size();
 
-			//DMatch& m = kv.second.at(0);
-			//DMatch& m = kv.second.at(0);
-			/*NewCData.matches.at(0).queryIdx = -110;
-			kv.second.at(0).queryIdx = -11110;*/
-
 			this->clusters.push_back(NewCData);
 		}
 	}
@@ -478,41 +449,27 @@ void Hough_Transform::sortClusters()
 		[](Cluster_data const& f, Cluster_data const& s){ return f.matches.size() > s.matches.size(); });
 }
 
-bool compareMatches(DMatch const & m1, DMatch const& m2)
+bool compareMatches(cv::DMatch const & m1, cv::DMatch const& m2)
 {
 	if (m1.queryIdx > m2.queryIdx)
-	{
 		return true;
-	}
 	if (m1.queryIdx < m2.queryIdx)
-	{
 		return false;
-	}
 	if (m1.trainIdx > m2.trainIdx)
-	{
 		return true;
-	}
 	return false;
 }
 
-int compareMatches2(DMatch const & m1, DMatch const& m2)
+int compareMatches2(cv::DMatch const & m1, cv::DMatch const& m2)
 {
 	if (m1.queryIdx > m2.queryIdx)
-	{
 		return 1;
-	}
 	if (m1.queryIdx < m2.queryIdx)
-	{
 		return -1;
-	}
 	if (m1.trainIdx > m2.trainIdx)
-	{
 		return 1;
-	}
 	if (m1.trainIdx < m2.trainIdx)
-	{
 		return -1;
-	}
 	return 0;
 }
 
@@ -523,8 +480,8 @@ void Hough_Transform::UseTransformConstraint(double initPointPercTh, double init
 
 	//int nthreads;
 	int clusters_num = this->clusters.size();
-	vector<Cluster_data> newClusters;
-	vector<DMatch> allfoundMatches;
+    std::vector<Cluster_data> newClusters;
+    std::vector<cv::DMatch> allfoundMatches;
 	size_t smallClusterSize = 4;
 	//int i = 0;
 #if !defined(_DEBUG) && defined(OMP_OPTIMIZATION)
@@ -538,13 +495,13 @@ void Hough_Transform::UseTransformConstraint(double initPointPercTh, double init
 		if (allfoundMatches.size() >= smallClusterSize)
 		{
 			std::sort(this->clusters.at(i).matches.begin(), this->clusters.at(i).matches.end(), compareMatches);
-			vector<DMatch> tmp(allfoundMatches.size() + this->clusters.at(i).matches.size());
-			std::vector<DMatch>::iterator it = std::set_difference(this->clusters.at(i).matches.begin(), this->clusters.at(i).matches.end(), allfoundMatches.begin(), allfoundMatches.end(), tmp.begin(), compareMatches);
+            std::vector<cv::DMatch> tmp(allfoundMatches.size() + this->clusters.at(i).matches.size());
+            std::vector<cv::DMatch>::iterator it = std::set_difference(this->clusters.at(i).matches.begin(), this->clusters.at(i).matches.end(), allfoundMatches.begin(), allfoundMatches.end(), tmp.begin(), compareMatches);
 			tmp.resize(it - tmp.begin());
 			this->clusters.at(i).matches = tmp;
 		}
-		vector<DMatch> eliminatedMatches = UseTransfForCluster(this->clusters.at(i), initPointPercTh, initModelPercTh, InitialRotationThresh, InitialScaleThresh, transfType, delClThresh, hip_check, RANSAC_iter, RANSAC_inlierDistT);
-		vector<DMatch> foundMatches = this->clusters.at(i).matches;
+        std::vector<cv::DMatch> eliminatedMatches = UseTransfForCluster(this->clusters.at(i), initPointPercTh, initModelPercTh, InitialRotationThresh, InitialScaleThresh, transfType, delClThresh, hip_check, RANSAC_iter, RANSAC_inlierDistT);
+        std::vector<cv::DMatch> foundMatches = this->clusters.at(i).matches;
 
 		if (foundMatches.size() >= smallClusterSize)
 		{
@@ -555,8 +512,8 @@ void Hough_Transform::UseTransformConstraint(double initPointPercTh, double init
 			}
 			else
 			{
-				vector<DMatch> tmp(allfoundMatches.size() + foundMatches.size());
-				std::vector<DMatch>::iterator it = std::set_union(allfoundMatches.begin(), allfoundMatches.end(), foundMatches.begin(), foundMatches.end(), tmp.begin(), compareMatches);
+                std::vector<cv::DMatch> tmp(allfoundMatches.size() + foundMatches.size());
+                std::vector<cv::DMatch>::iterator it = std::set_union(allfoundMatches.begin(), allfoundMatches.end(), foundMatches.begin(), foundMatches.end(), tmp.begin(), compareMatches);
 				tmp.resize(it - tmp.begin());
 				allfoundMatches = tmp;
 
@@ -567,8 +524,7 @@ void Hough_Transform::UseTransformConstraint(double initPointPercTh, double init
 	this->sortClusters();
 }
 
-
-vector<DMatch> Hough_Transform::UseTransfForCluster(Cluster_data& NewCData, double initPointPercTh, double initModelPercTh, double InitialRotationThresh, double InitialScaleThresh, TransformType transfType, double deleteClusterThresh, int hip_check, int RANSAC_iter, double RANSAC_inlierDistT)
+std::vector<cv::DMatch> Hough_Transform::UseTransfForCluster(Cluster_data& NewCData, double initPointPercTh, double initModelPercTh, double InitialRotationThresh, double InitialScaleThresh, TransformType transfType, double deleteClusterThresh, int hip_check, int RANSAC_iter, double RANSAC_inlierDistT)
 {
 	double meanDistance = DBL_MAX;
 	int repeat = 0;
@@ -580,13 +536,13 @@ vector<DMatch> Hough_Transform::UseTransfForCluster(Cluster_data& NewCData, doub
 	int eliminated = 0;
 	//char windowname[200];
 
-	vector<DMatch> allEliminatedMatches;
+    std::vector<cv::DMatch> allEliminatedMatches;
 	double scale1 = 0;
 	double scale2 = 0;
 	double ratio = 0;
 	for (size_t i = 0; i < NewCData.matches.size(); i++)
 	{
-		DMatch m = NewCData.matches.at(i);
+        cv::DMatch m = NewCData.matches.at(i);
 		int indx1 = m.queryIdx;
 		int indx2 = m.trainIdx;
 
@@ -608,8 +564,7 @@ vector<DMatch> Hough_Transform::UseTransfForCluster(Cluster_data& NewCData, doub
 	{
 		NewCData.fitModelParams(this->keypoints1, this->keypoints2, transfTypeNew, 0, image1, image2);
 	}
-	int tmp = NewCData.transfMat.size().width;
-	vector<DMatch> eliminatedMatches;
+    std::vector<cv::DMatch> eliminatedMatches;
 	eliminatedMatches = NewCData.eliminateOutliers(this->keypoints1, this->keypoints2, PointThresh, ModelThresh, rotaionThresh, scaleThresh, this->image1, this->image2, 0);
 	allEliminatedMatches.insert(allEliminatedMatches.end(), eliminatedMatches.begin(), eliminatedMatches.end());
 

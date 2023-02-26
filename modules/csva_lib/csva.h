@@ -59,23 +59,23 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 namespace csva
 {
 	enum geometry_mode {  AEROSPACE = 0, THREEDIM_SCENE = 1};
-	CSVA_LIB_API cv::Mat filter_matches(const std::vector<cv::KeyPoint>& kpts1, const std::vector<cv::KeyPoint>& kpts2, const std::vector<cv::DMatch>& matches,
-		const cv::Mat& im1, const  cv::Mat& im2, geometry_mode mode,
+    CSVA_LIB_API cv::Mat filter_matches(const std::vector<cv::KeyPoint>& kpts1, const std::vector<cv::KeyPoint>& kpts2, const std::vector<cv::DMatch>& matches,
+        const cv::Mat& im1, const  cv::Mat& im2, geometry_mode mode,
 		int type, std::vector<cv::DMatch> &inliers,
 		double* confidence, double LoweProb);
 
 	CSVA_LIB_API void primary_filtering(const std::vector<cv::KeyPoint>& kpts1, const std::vector<cv::KeyPoint>& kpts2,
 		const std::vector<cv::DMatch>& matches, float NNthresh, std::vector<cv::DMatch> &inliers);
 
-	CSVA_LIB_API std::array<double, 6> confidence_estimation(std::vector<cv::DMatch>& inliers, const cv::Mat& PT, std::vector<cv::KeyPoint> kpts1, std::vector<cv::KeyPoint> kpts2,
-		const std::vector<cv::DMatch> &excludedMatches, cv::Mat im1, cv::Mat im2, int mode, int type, double LoweProb);
+    CSVA_LIB_API std::array<double, 6> confidence_estimation(std::vector<cv::DMatch>& inliers, const cv::Mat& PT, std::vector<cv::KeyPoint> kpts1, std::vector<cv::KeyPoint> kpts2,
+        const std::vector<cv::DMatch> &excludedMatches, cv::Mat im1, cv::Mat im2, int mode, int type, double LoweProb);
 
 	CSVA_LIB_API void verify_clusters(const std::vector< std::vector<cv::DMatch> >& clusters, std::vector< std::vector<cv::DMatch> >& filtered,
 		std::vector<cv::Mat>& transforms, const std::vector<cv::KeyPoint>& kpts1,
-		const std::vector<cv::KeyPoint>& kpts2, const cv::Mat& image1, const cv::Mat& image2);
+        const std::vector<cv::KeyPoint>& kpts2, const cv::Mat& image1, const cv::Mat& image2);
 
 	CSVA_LIB_API void hough_transform(const std::vector<cv::KeyPoint>& kpts1, const std::vector<cv::KeyPoint>& kpts2,
-		const std::vector<cv::DMatch>& matches, const cv::Mat& image1, const cv::Mat& image2,
+        const std::vector<cv::DMatch>& matches, const cv::Mat& image1, const cv::Mat& image2,
 		std::vector<std::vector<cv::DMatch> >& clusters, int vote_thresh = 0);
 
 }

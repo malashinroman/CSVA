@@ -31,8 +31,6 @@ Permission is hereby granted, free of charge, to any person obtaining
 
 #pragma once
 #include <opencv2/core.hpp>
-using namespace cv;
-using namespace std;
 
 #include <unordered_map>
 #include <array>
@@ -45,6 +43,6 @@ class HoughListCpp
 {
 public:
 	HoughListCpp();
-	std::unordered_map<index4D, vector<DMatch>, function<size_t(const index4D)> > hash_table;
-	int AddMatch(DMatch match, int xbin, int ybin, int orbin, int scalebin);
+    std::unordered_map<index4D, std::vector<cv::DMatch>, std::function<size_t(const index4D)> > hash_table;
+    int AddMatch(cv::DMatch match, int xbin, int ybin, int orbin, int scalebin);
 };

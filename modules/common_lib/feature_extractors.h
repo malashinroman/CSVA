@@ -50,7 +50,7 @@ class OpenCVfeatures
 {
 public:
 	bool globalInitializationDescriptors;
-	cv::Ptr<cv::xfeatures2d::SiftFeatureDetector> detectorSift;
+    cv::Ptr<cv::SiftFeatureDetector> detectorSift;
 	cv::Ptr<cv::xfeatures2d::SurfFeatureDetector> detectorSurf;
 	cv::Ptr<cv::FastFeatureDetector> detectorFast; // detectorFast(20)
 	cv::Ptr<cv::xfeatures2d::VGG> vggfeatures;
@@ -69,7 +69,7 @@ public:
 	//BRISK detectorBrisk(10, 4);
 	cv::Ptr<cv::BRISK> detectorBrisk;
 
-	cv::Ptr<cv::xfeatures2d::SiftDescriptorExtractor> extractorSift;
+    cv::Ptr<cv::SiftDescriptorExtractor> extractorSift;
 	cv::Ptr<cv::xfeatures2d::SurfDescriptorExtractor> extractorSurf;
 	//Ptr<OpponentColorDescriptorExtractor> extractorSURFOpponent(new SurfDescriptorExtractor);
 
@@ -92,12 +92,12 @@ public:
 	void releaseDetectorDescriptors();
 	OpenCVfeatures();
 	~OpenCVfeatures();
-	std::vector<cv::DMatch> getLocalPatchMatches2(cv::Mat image1, cv::Mat image2,
+    std::vector<cv::DMatch> getLocalPatchMatches2(cv::Mat image1, cv::Mat image2,
 		std::vector<cv::KeyPoint>& points1, std::vector<cv::KeyPoint>& points2,
 		int type, int ConsoleOutput);
 
-	std::vector<cv::DMatch> getMatches(cv::Mat descs1, cv::Mat descs2, int type, int ConsoleOutput);
+    std::vector<cv::DMatch> getMatches(cv::Mat descs1, cv::Mat descs2, int type, int ConsoleOutput);
 	cv::Mat getDescriptors(cv::Mat image, std::vector<cv::KeyPoint>& points, int type, int ConsoleOutput);
 	std::vector<cv::KeyPoint> getKeyPoints(cv::Mat image, int type, int ConsoleOutput);
-	std::vector<cv::KeyPoint> refineNotUniqueKeypoints(std::vector<cv::KeyPoint> keypoints, cv::Mat image, int k, double nnr_thresh, int type);
+    std::vector<cv::KeyPoint> refineNotUniqueKeypoints(std::vector<cv::KeyPoint> keypoints, cv::Mat image, int k, double nnr_thresh, int type);
 };

@@ -40,15 +40,13 @@ Permission is hereby granted, free of charge, to any person obtaining
 #include "csva_lib/csva.h"
 #include "3Drecognition.h"
 #include <time.h>
-using namespace cv;
-using namespace std;
 
-vector<DMatch> call3D(char* image1_path, char* image2_path, Mat* matchresult, vector<KeyPoint>& points1, vector<KeyPoint>& points2, int LocalMatchtype = 352, int consoleOuput = 0, int graphicalOutput = 0)
+std::vector<cv::DMatch> call3D(char* image1_path, char* image2_path, cv::Mat* matchresult, std::vector<cv::KeyPoint>& points1, std::vector<cv::KeyPoint>& points2, int LocalMatchtype = 352, int consoleOuput = 0, int graphicalOutput = 0)
 {
 	clock_t start = clock();
 
-	Mat image1 = imread(image1_path);
-	Mat image2 = imread(image2_path);
+    cv::Mat image1 = cv::imread(image1_path);
+    cv::Mat image2 = cv::imread(image2_path);
 	OpenCVfeatures feat;
 
 	if((image1.size().width ==0) || (image2.size().width ==0))
@@ -57,11 +55,10 @@ vector<DMatch> call3D(char* image1_path, char* image2_path, Mat* matchresult, ve
 	}
 	clock_t finish = clock();
 	int t1 = (finish - start) * 1000 / CLOCKS_PER_SEC;
-	int tmp1, tmp2, tmp3;
-	std::vector<DMatch> matches = feat.getLocalPatchMatches2(image1, image2, points1, points2, LocalMatchtype, 0);
+    std::vector<cv::DMatch> matches = feat.getLocalPatchMatches2(image1, image2, points1, points2, LocalMatchtype, 0);
 	clock_t chp = clock();
 	int t2 = (chp - finish) * 1000 / CLOCKS_PER_SEC;
-	vector<DMatch> goodmatches;
+    std::vector<cv::DMatch> goodmatches;
 	double confidence[6];
 	csva::filter_matches(points1, points2, matches, image1, image2, csva::geometry_mode::THREEDIM_SCENE, LocalMatchtype, goodmatches, confidence, 0.001);
 	return goodmatches;
