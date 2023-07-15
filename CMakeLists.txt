@@ -5,7 +5,7 @@ include_directories(${PROJECT_SOURCE_DIR}/modules)
 
 
 if (CMAKE_COMPILER_IS_GNUCXX)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=c++14 -g -fPIC -fext-numeric-literals" CACHE STRING COMPILE_FLAGS FORCE)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=c++14 -g -fPIC" CACHE STRING COMPILE_FLAGS FORCE)
     set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -Wall -g -fPIC" CACHE STRING COMPILE_FLAGS FORCE)
 
     set(CMAKE_CXX_FLAGS_RELEASE "-O3 -g -march=native --fast-math -ffast-math -mtune=native -funroll-loops -DNDEBUG -DBOOST_DISABLE_ASSERTS" CACHE STRING COMPILE_FLAGS FORCE)

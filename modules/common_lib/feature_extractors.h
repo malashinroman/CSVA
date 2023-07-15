@@ -1,5 +1,6 @@
 #pragma once
 
+#include <opencv2/features2d.hpp>
 #include <stdio.h>
 #include <opencv2/core.hpp>
 #include "opencv2/features2d/features2d.hpp"
@@ -50,7 +51,9 @@ class OpenCVfeatures
 {
 public:
 	bool globalInitializationDescriptors;
-	cv::Ptr<cv::xfeatures2d::SiftFeatureDetector> detectorSift;
+
+	cv::Ptr<cv::SiftFeatureDetector> detectorSift;
+	// cv::Ptr<cv::xfeatures2d::SiftFeatureDetector> detectorSift;
 	cv::Ptr<cv::xfeatures2d::SurfFeatureDetector> detectorSurf;
 	cv::Ptr<cv::FastFeatureDetector> detectorFast; // detectorFast(20)
 	cv::Ptr<cv::xfeatures2d::VGG> vggfeatures;
@@ -68,8 +71,9 @@ public:
 	cv::Ptr<cv::ORB> detectorOrb;
 	//BRISK detectorBrisk(10, 4);
 	cv::Ptr<cv::BRISK> detectorBrisk;
+  cv::Ptr<cv::SiftFeatureDetector> extractorSift;
 
-	cv::Ptr<cv::xfeatures2d::SiftDescriptorExtractor> extractorSift;
+	// cv::Ptr<cv::xfeatures2d::SiftDescriptorExtractor> extractorSift;
 	cv::Ptr<cv::xfeatures2d::SurfDescriptorExtractor> extractorSurf;
 	//Ptr<OpponentColorDescriptorExtractor> extractorSURFOpponent(new SurfDescriptorExtractor);
 

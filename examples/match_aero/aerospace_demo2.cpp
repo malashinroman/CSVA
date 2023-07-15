@@ -47,7 +47,6 @@ Permission is hereby granted, free of charge, to any person obtaining
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/imgproc/imgproc_c.h>
 
-// #include <boost/filesystem.hpp>
 #include <bits/stdc++.h>
 #include <boost/filesystem.hpp>
 #include <iostream>
@@ -56,8 +55,10 @@ Permission is hereby granted, free of charge, to any person obtaining
 #include <sys/types.h>
 using namespace std;
 using namespace cv;
-#define SAVE_JPG_QUALITY 100
-// #include <direct.h>
+
+#include <iostream>
+#include <sstream>
+#include <vector>
 
 // for string delimiter
 std::vector<std::string> split(std::string s, std::string delimiter) {
@@ -75,6 +76,8 @@ std::vector<std::string> split(std::string s, std::string delimiter) {
   return res;
 }
 
+#define SAVE_JPG_QUALITY 100
+// #include <direct.h>
 int makeDirectory(string folder) {
   // alternative is
   //  mkdir(folder.c_str());
@@ -272,7 +275,7 @@ int main(int argc, char *argv[]) {
                                 352, inliers, confide, 0.01);
   printf("CSVA time = %f s\n", ((float)(clock()) - start) / CLOCKS_PER_SEC);
   start = clock();
-  Mat res = printMatches(kpts1, kpts2, inliers, image2_process, image2_process,
+  Mat res = printMatches(kpts1, kpts2, inliers, image1_process, image2_process,
                          cv::DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS |
                              cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
 
@@ -280,7 +283,7 @@ int main(int argc, char *argv[]) {
   std::vector<std::string> path = splitpath(argv[1], delims);
   std::vector<std::string> path2 = splitpath(argv[2], delims);
   string resultFolder = path.back() + "+" + path2.back();
-  // resultFolder += '_res2';
+  resultFolder += '_res2';
 
   // string resultFolder = "result";
 
@@ -340,5 +343,16 @@ int main(int argc, char *argv[]) {
     m.copyTo(result);
   }
 
+  // get position of the first image center in the _scene
+  Mat center = (Mat_<double>(3, 1) << image1.cols / 2, image1.rows / 2, 1);
+
+  // transform center with PT
+  Mat center2 = PT * center;
+
+  // convert from homogenous coordinates to Decart
+  center2 = center2 / center2.at<double>(2, 0);
+
+  cout << "center: " << center << endl;
+  cout << "position: " << center2 << endl;
   return 0;
 }

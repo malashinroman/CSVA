@@ -4,6 +4,37 @@ C++ implementation of the robust keypoint elimination algorithm described in the
 ```
 Malashin R.O. Core algorithm for structural verification of keypoint matches. Intelligent Systems Reference Library. Computer Vision in Control Systems-3. 2018. P. 251-286
 ```
+
+## Update 2023
+
+I slightly refactored code that is now compatible with opencv4.x and should be easier to compile.
+
+### Ubuntu 22.04 install
+
+1. Install Boost
+
+```
+apt-get install libboost-all-dev
+```
+2. Download, compile and install opencv with opencv_contrib. Follow opencv [documentation](https://docs.opencv.org/4.x/d7/d9f/tutorial_linux_install.html "documenation"). Make sure to enable DOPENCV_ENABLE_NONFREE flag when configure.
+
+I used the following command:
+```
+cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DOPENCV_ENABLE_NONFREE:BOOL=ON -DOPENCV_EXTRA_MODULES_PATH=../opencv_contrib-4.x/modules ../opencv-4.x
+```
+
+followed by 'make -j8' and 'make install'
+
+4. clone CSVA project from github, then in command line:
+```
+cd CSVA
+mkdir build && cd build
+cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..
+make -j8
+```
+5. You should get following files in CSVA/bin directory libcommon_lib.a, libcsva_lib.so, match3D,  match_aero.
+If you see them, then everything is OK, and you can proceed to tests.  
+
 ## Description
 
 CSVA (“core” structural verification algorithm) is a robust and fast algorithm for outlier elimination of keypoint matches (e.g. SURF, SIFT or BRISK features) that heavily exploits gemetrical constraints. It can be used by developers and researches in different practical tasks with minor adaptation. CSVA an improved version of SIFT clustering proposed by David Lowe in SIFT.
@@ -41,6 +72,7 @@ Windows 7 and Ubuntu 14.04 were tested
 ## Compile
 
 Cmake is a recommended tool for creating CSVA project
+
 
 ## Running test examples
 

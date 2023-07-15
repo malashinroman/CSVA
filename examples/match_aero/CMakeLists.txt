@@ -5,7 +5,7 @@ FIND_PACKAGE( OpenCV REQUIRED core imgproc highgui)
 include_directories(${OpenCV_INCLUDE_DIRS})
 
 if (UNIX)
-        find_package(Boost REQUIRED COMPONENTS filesystem system)
+  find_package(Boost REQUIRED COMPONENTS filesystem system)
 	INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIRS} )
 endif (UNIX)
 
@@ -17,14 +17,14 @@ if (WIN32)
 	# message(${Boost_LIBRARY_DIR})
 endif (WIN32)
 
-if (UNIX)
-   add_compile_options(-fext-numeric-literals)
-endif (UNIX)
+# if (UNIX)
+#    add_compile_options(-fext-numeric-literals)
+# endif (UNIX)
 
+add_compile_options(-fopenmp)
 #if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-  add_compile_options(-fopenmp)
 #else ()
-  add_compile_options(-openmp)
+# add_compile_options(-openmp)
 #endif()
 
 add_compile_options(-std=c++11)
