@@ -35,6 +35,8 @@ make -j8
 5. You should get following files in CSVA/bin directory libcommon_lib.a, libcsva_lib.so, match3D,  match_aero.
 If you see them, then everything is OK, and you can proceed to tests.  
 
+See docker/Dockerfile to see all commands for clean installation in Ubuntu
+
 ## Description
 
 CSVA (“core” structural verification algorithm) is a robust and fast algorithm for outlier elimination of keypoint matches (e.g. SURF, SIFT or BRISK features) that heavily exploits gemetrical constraints. It can be used by developers and researches in different practical tasks with minor adaptation. CSVA an improved version of SIFT clustering proposed by David Lowe in SIFT.
