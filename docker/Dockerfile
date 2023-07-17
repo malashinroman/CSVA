@@ -15,5 +15,5 @@ RUN make -j8
 RUN make install
 RUN apt install -y git
 RUN git clone https://github.com/malashinroman/CSVA
-RUN cd CSVA && git checkout opencv4 && mkdir build && cd build && \
+RUN cd CSVA && mkdir build && cd build && \
 cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON .. && make -j8
