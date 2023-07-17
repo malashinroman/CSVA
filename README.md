@@ -7,7 +7,7 @@ Malashin R.O. Core algorithm for structural verification of keypoint matches. In
 
 ## Update 2023
 
-I slightly refactored code that is now compatible with opencv4.x and should be easier to compile.
+I did minor changes to the code to make it compatible with new opencv4.x.
 
 ### Ubuntu 22.04 install
 
@@ -16,26 +16,29 @@ I slightly refactored code that is now compatible with opencv4.x and should be e
 ```
 apt-get install libboost-all-dev
 ```
-2. Download, compile and install opencv with opencv_contrib. Follow opencv [documentation](https://docs.opencv.org/4.x/d7/d9f/tutorial_linux_install.html "documenation"). Make sure to enable DOPENCV_ENABLE_NONFREE flag when configure.
-
-I used the following command:
+2. Download, compile and install opencv with opencv_contrib. Follow opencv [documentation](https://docs.opencv.org/4.x/d7/d9f/tutorial_linux_install.html "documenation").
+  
+   Make sure to enable `DOPENCV_ENABLE_NONFREE` flag when configure. The flag is needed for SURF detector, which is used by default (you can substitute it later). I used the following commands:
 ```
 cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DOPENCV_ENABLE_NONFREE:BOOL=ON -DOPENCV_EXTRA_MODULES_PATH=../opencv_contrib-4.x/modules ../opencv-4.x
+make -j8
+make install
 ```
 
-followed by 'make -j8' and 'make install'
-
-4. clone CSVA project from github, then in command line:
+4. Compile CSVA project.
 ```
+git clone https://github.com/malashinroman/CSVA
 cd CSVA
 mkdir build && cd build
 cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..
 make -j8
 ```
-5. You should get following files in CSVA/bin directory libcommon_lib.a, libcsva_lib.so, match3D,  match_aero.
+5. You should get following files in CSVA/bin directory
+   >libcommon_lib.a, libcsva_lib.so, match3D,  match_aero.
+
 If you see them, then everything is OK, and you can proceed to tests.  
 
-See docker/Dockerfile to see all commands for clean installation in Ubuntu
+See [Dockerfile](docker/Dockerfile) to see all commands for clean installation in Ubuntu
 
 ## Description
 
