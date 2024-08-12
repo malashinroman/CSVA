@@ -1,7 +1,7 @@
-PROJECT( match_aero )
+PROJECT(match_aero)
 cmake_minimum_required(VERSION 3.4)
 
-FIND_PACKAGE( OpenCV REQUIRED core imgproc highgui)
+FIND_PACKAGE(OpenCV REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
 
 if (UNIX)
@@ -29,4 +29,4 @@ add_compile_options(-fopenmp)
 
 add_compile_options(-std=c++11)
 ADD_EXECUTABLE(match_aero aerospace_demo.cpp)
-TARGET_LINK_LIBRARIES(match_aero csva_lib common_lib ${OpenCV_LIBS} ${Boost_LIBRARIES})
+TARGET_LINK_LIBRARIES(match_aero csva_lib common_lib ${OpenCV_LIBS} ${Boost_LIBRARIES} stdc++fs)

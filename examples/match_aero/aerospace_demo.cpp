@@ -32,311 +32,498 @@ Permission is hereby granted, free of charge, to any person obtaining
  SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#include <opencv2/core.hpp>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
-
-#include "common_lib/feature_extractors.h"
-#include "csva_lib/csva.h"
-#include <iostream>
-#include <opencv2/calib3d/calib3d.hpp>
-#include <opencv2/calib3d/calib3d_c.h>
-#include <opencv2/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/imgproc/imgproc_c.h>
-
-// #include <boost/filesystem.hpp>
-#include <bits/stdc++.h>
-#include <boost/filesystem.hpp>
+#include <filesystem>
 #include <iostream>
 #include <set>
-#include <sys/stat.h>
-#include <sys/types.h>
-using namespace std;
-using namespace cv;
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <opencv2/core.hpp>
+#include "common_lib/feature_extractors.h"
+#include "csva_lib/csva.h"
+#include <opencv2/opencv.hpp>
+
 #define SAVE_JPG_QUALITY 100
-// #include <direct.h>
 
-// for string delimiter
-std::vector<std::string> split(std::string s, std::string delimiter) {
-  size_t pos_start = 0, pos_end, delim_len = delimiter.length();
-  std::string token;
-  std::vector<std::string> res;
 
-  while ((pos_end = s.find(delimiter, pos_start)) != std::string::npos) {
-    token = s.substr(pos_start, pos_end - pos_start);
-    pos_start = pos_end + delim_len;
-    res.push_back(token);
-  }
+cv::Mat printMatches(std::vector<cv::KeyPoint> pts1,
+                     std::vector<cv::KeyPoint> pts2,
+                     std::vector<cv::DMatch> matches, cv::Mat image1,
+                     cv::Mat image2, cv::DrawMatchesFlags flags)
 
-  res.push_back(s.substr(pos_start));
-  return res;
-}
+{
 
-int makeDirectory(string folder) {
-  // alternative is
-  //  mkdir(folder.c_str());
-  boost::filesystem::create_directory(folder);
+  cv::Mat outImage;
 
-  // #ifdef WIN32
-  //	mkdir(folder.c_str());
-  // #else
-  //	mkdir(folder.c_str(), 0700);
-  // #endif
-  return 0;
-}
-
-Mat printMatches(vector<KeyPoint> pts1, vector<KeyPoint> pts2,
-                 vector<DMatch> matches, Mat image1, Mat image2,
-                 cv::DrawMatchesFlags flags) {
-  Mat outImage;
   drawMatches(image1, pts1, image2, pts2, matches, outImage, CV_RGB(0, 255, 0),
-              CV_RGB(0, 255, 0), vector<char>(), flags);
+              CV_RGB(0, 255, 0), std::vector<char>(), flags);
+
   return outImage;
 }
-void getMatchedKeypoints(const vector<DMatch> &matches,
-                         const vector<KeyPoint> &keypoints1,
-                         const vector<KeyPoint> &keypoints2,
-                         vector<KeyPoint> &matchedkeypoints1,
-                         vector<KeyPoint> &matchedkeypoints2) {
-  for (unsigned int i = 0; i < matches.size(); i++) {
+
+///
+
+void getMatchedKeypoints(const std::vector<cv::DMatch> &matches,
+
+                         const std::vector<cv::KeyPoint> &keypoints1,
+                         const std::vector<cv::KeyPoint> &keypoints2,
+
+                         std::vector<cv::KeyPoint> &matchedkeypoints1,
+                         std::vector<cv::KeyPoint> &matchedkeypoints2)
+
+{
+
+  for (unsigned int i = 0; i < matches.size(); i++)
+
+  {
+
     matchedkeypoints1.push_back(keypoints1.at(matches.at(i).queryIdx));
+
     matchedkeypoints2.push_back(keypoints2.at(matches.at(i).trainIdx));
   }
 }
-Mat homographyOpencv(vector<DMatch> inliers, vector<KeyPoint> kpts1_,
-                     vector<KeyPoint> kpts2_) {
-  vector<KeyPoint> kpts1;
-  vector<KeyPoint> kpts2;
+
+///
+
+cv::Mat homographyOpencv(std::vector<cv::DMatch> inliers,
+                         std::vector<cv::KeyPoint> kpts1_,
+                         std::vector<cv::KeyPoint> kpts2_)
+
+{
+
+  std::vector<cv::KeyPoint> kpts1;
+
+  std::vector<cv::KeyPoint> kpts2;
 
   getMatchedKeypoints(inliers, kpts1_, kpts2_, kpts1, kpts2);
-  vector<Point2f> points2D1;
-  vector<Point2f> points2D2;
-  Mat P1 = Mat(inliers.size(), 2, CV_64F, 0.);
-  Mat P2 = Mat(inliers.size(), 2, CV_64F, 0.);
-  Mat PT;
-  for (int i = 0; i < kpts1.size(); i++) {
+
+  std::vector<cv::Point2f> points2D1;
+
+  std::vector<cv::Point2f> points2D2;
+
+  cv::Mat P1 = cv::Mat(inliers.size(), 2, CV_64F, 0.);
+
+  cv::Mat P2 = cv::Mat(inliers.size(), 2, CV_64F, 0.);
+
+  cv::Mat PT;
+
+  for (int i = 0; i < kpts1.size(); i++)
+
+  {
+
     P1.at<double>(i, 0) = kpts1.at(i).pt.x;
+
     P1.at<double>(i, 1) = kpts1.at(i).pt.y;
+
     P2.at<double>(i, 0) = kpts2.at(i).pt.x;
+
     P2.at<double>(i, 1) = kpts2.at(i).pt.y;
+
     points2D1.push_back(kpts1.at(i).pt);
+
     points2D2.push_back(kpts2.at(i).pt);
   }
-  if (points2D1.size() < 4) {
-    PT = Mat();
-  } else {
-    PT = findHomography(points2D1, points2D2, CV_LMEDS);
-  }
+
+  if (points2D1.size() > 3)
+
+    PT = findHomography(points2D1, points2D2, cv::LMEDS);
+
   return PT;
 }
-Mat mergeImages(Mat img1, Mat img2, int topdown) {
-  if (topdown) {
+
+///
+
+cv::Mat mergeImages(cv::Mat img1, cv::Mat img2, int topdown)
+
+{
+
+  if (topdown)
+
+  {
+
     int newWidth = img1.size().width > img2.size().width ? img1.size().width
                                                          : img2.size().width;
-    Mat outImage(Size(newWidth, img1.size().height + img2.size().height),
-                 CV_8UC3);
-    Mat left_roi(outImage, Rect(0, 0, img1.size().width, img1.size().height));
+
+    cv::Mat outImage(
+        cv::Size(newWidth, img1.size().height + img2.size().height), CV_8UC3);
+
+    cv::Mat left_roi(outImage,
+                     cv::Rect(0, 0, img1.size().width, img1.size().height));
+
     img1.copyTo(left_roi);
-    Mat down_roi(outImage, Rect(0, img1.size().height, img2.size().width,
-                                img2.size().height));
+
+    cv::Mat down_roi(outImage, cv::Rect(0, img1.size().height,
+                                        img2.size().width, img2.size().height));
+
     img2.copyTo(down_roi);
+
     return outImage;
-  } else {
+
+  }
+
+  else
+
+  {
+
     int newWidth = img1.size().width + img2.size().width;
+
     int newHeight = img1.size().height > img2.size().height
                         ? img1.size().height
                         : img2.size().height;
-    Mat outImage(Size(newWidth, newHeight), CV_8UC3);
-    Mat left_roi(outImage, Rect(0, 0, img1.size().width, img1.size().height));
+
+    cv::Mat outImage(cv::Size(newWidth, newHeight), CV_8UC3);
+
+    cv::Mat left_roi(outImage,
+                     cv::Rect(0, 0, img1.size().width, img1.size().height));
+
     img1.copyTo(left_roi);
-    Mat right_roi(outImage, Rect(img1.size().width, 0, img2.size().width,
-                                 img2.size().height));
+
+    cv::Mat right_roi(
+        outImage,
+        cv::Rect(img1.size().width, 0, img2.size().width, img2.size().height));
+
     img2.copyTo(right_roi);
+
     return outImage;
   }
 }
+
+///
+
 std::vector<std::string> splitpath(const std::string &str,
-                                   const std::set<char> delimiters) {
+                                   const std::set<char> delimiters)
+
+{
+
   std::vector<std::string> result;
 
   char const *pch = str.c_str();
+
   char const *start = pch;
-  for (; *pch; ++pch) {
-    if (delimiters.find(*pch) != delimiters.end()) {
-      if (start != pch) {
+
+  for (; *pch; ++pch)
+
+  {
+
+    if (delimiters.find(*pch) != delimiters.end())
+
+    {
+
+      if (start != pch)
+
+      {
+
         std::string str(start, pch);
+
         result.push_back(str);
-      } else {
+
+      }
+
+      else
+
+      {
+
         result.push_back("");
       }
+
       start = pch + 1;
     }
   }
+
   result.push_back(start);
 
   return result;
 }
 
-int main(int argc, char *argv[]) {
-  if (argc < 6) {
-    cout << "match_aero image1 image2 scale1 scale2 type \n"
-         << "image1: object photo" << endl
-         << "image1: plan photo" << endl
-         << "scale1: coeff to resize image1" << endl
-         << "scale2: coeff to resize image2" << endl
-         << "type: 1 or 2 (1 for fast, 2 - robust)" << endl
-         << "example: match_aero im1.jpg im2.jpg 0.5 0.5 1" << endl;
+///
+
+int main(int argc, char *argv[])
+
+{
+
+  if (argc < 6)
+
+  {
+
+    std::cout << "match_aero image1 image2 scale1 scale2 type \n"
+              <<
+
+        "image1: object photo" << std::endl
+              <<
+
+        "image1: plan photo" << std::endl
+              <<
+
+        "scale1: coeff to resize image1" << std::endl
+              <<
+
+        "scale2: coeff to resize image2" << std::endl
+              <<
+
+        "type: 1 or 2 (1 for fast, 2 - robust)" << std::endl
+              <<
+
+        "example: match_aero im1.jpg im2.jpg 0.5 0.5 1" << std::endl;
+
     return -1;
   }
-  Mat im1_ = imread(argv[1]);
-  Mat im2_ = imread(argv[2]);
+
+  cv::Mat im1_ = cv::imread(argv[1]);
+
+  cv::Mat im2_ = cv::imread(argv[2]);
+
   float scale1 = atof(argv[3]);
+
   float scale2 = atof(argv[4]);
 
   int type = 352;
-  if (atoi(argv[5]) == 2) {
-    cout << "robust regime" << endl;
+
+  if (atoi(argv[5]) == 2)
+
+  {
+
+    std::cout << "robust regime" << std::endl;
+
     type = 212;
-  } else if (atoi(argv[5]) == 1) {
-    cout << "fast regime" << endl;
+
+  }
+
+  else if (atoi(argv[5]) == 1)
+
+  {
+
+    std::cout << "fast regime" << std::endl;
+
     type = 352;
-  } else if (atoi(argv[5]) > 100) {
+
+  }
+
+  else if (atoi(argv[5]) > 100)
+
+  {
+
     type = atoi(argv[5]);
-  } else {
-    cout << "unknown regime" << endl;
+
+  }
+
+  else
+
+  {
+
+    std::cout << "unknown regime" << std::endl;
+
     return 0;
   }
 
-  cout << "image 1: " << argv[1] << endl;
-  cout << "image 2: " << argv[2] << endl;
-  cout << "scale coeff 1: " << scale1 << endl;
-  cout << "scale coeff 2: " << scale2 << endl;
+  std::cout << "image 1: " << argv[1] << std::endl;
+
+  std::cout << "image 2: " << argv[2] << std::endl;
+
+  std::cout << "scale coeff 1: " << scale1 << std::endl;
+
+  std::cout << "scale coeff 2: " << scale2 << std::endl;
 
   assert(!im1_.empty());
+
   assert(!im2_.empty());
-  vector<KeyPoint> kpts1;
-  vector<KeyPoint> kpts2;
-  int dettime, desctime, mtime;
-  Mat image1, image2, image1c, image2c, image1_process, image2_process;
-  Mat im1, im2;
 
-  if (im1_.channels() == 3) {
-    cvtColor(im1_, image1, CV_BGR2GRAY);
+  std::vector<cv::KeyPoint> kpts1;
+
+  std::vector<cv::KeyPoint> kpts2;
+
+  cv::Mat image1, image2, image1c, image2c, image1_process, image2_process;
+
+  if (im1_.channels() == 3)
+
+  {
+
+    cvtColor(im1_, image1, cv::COLOR_BGR2GRAY);
+
     image1c = im1_.clone();
-  } else {
+
+  }
+
+  else
+
+  {
+
     image1 = im1_.clone();
-    cvtColor(im1_, image1c, CV_GRAY2BGR);
+
+    cvtColor(im1_, image1c, cv::COLOR_GRAY2BGR);
   }
 
-  if (im2_.channels() == 3) {
-    cvtColor(im2_, image2, CV_BGR2GRAY);
+  if (im2_.channels() == 3)
+
+  {
+
+    cvtColor(im2_, image2, cv::COLOR_BGR2GRAY);
+
     image2c = im2_.clone();
-  } else {
-    image2 = im2_.clone();
-    cvtColor(im2_, image2c, CV_GRAY2BGR);
+
   }
 
-  resize(image1, image1_process, Size(), scale1, scale1);
-  resize(image2, image2_process, Size(), scale2, scale2);
+  else
+
+  {
+
+    image2 = im2_.clone();
+
+    cvtColor(im2_, image2c, cv::COLOR_GRAY2BGR);
+  }
+
+  resize(image1, image1_process, cv::Size(), scale1, scale1);
+
+  resize(image2, image2_process, cv::Size(), scale2, scale2);
+
   // double scalef = scale2 / scale1;
 
-  Mat preT1, preT2;
+  cv::Mat preT1, preT2;
+
   double tmp[9] = {scale1, 0, 0, 0, scale1, 0, 0, 0, 1};
-  Mat(3, 3, CV_64F, tmp).copyTo(preT1);
+
+  cv::Mat(3, 3, CV_64F, tmp).copyTo(preT1);
+
   double tmp2[9] = {scale2, 0, 0, 0, scale2, 0, 0, 0, 1};
-  Mat(3, 3, CV_64F, tmp2).copyTo(preT2);
+
+  cv::Mat(3, 3, CV_64F, tmp2).copyTo(preT2);
 
   OpenCVfeatures feat;
-  vector<DMatch> matches = feat.getLocalPatchMatches2(
+
+  std::vector<cv::DMatch> matches = feat.getLocalPatchMatches2(
       image1_process, image2_process, kpts1, kpts2, type, 1);
 
-  Mat image1_proj, image1_projc;
-  Mat outim;
-  Mat imageMask, xoredImage, alignedImages;
-  Mat imageMaskc, xoredImagec, alignedImagesc;
+  cv::Mat image1_proj, image1_projc;
+
+  cv::Mat outim;
+
+  cv::Mat imageMask, xoredImage, alignedImages;
+
+  cv::Mat imageMaskc, xoredImagec, alignedImagesc;
+
   // char* res_file_name = "shalalla.jpg";
-  vector<DMatch> inliers;
+
+  std::vector<cv::DMatch> inliers;
+
   double confide[6];
-  cout << "number of generated matches: " << matches.size() << endl;
+
+  std::cout << "number of generated matches: " << matches.size() << std::endl;
+
   clock_t start = clock();
+
   cv::Ptr<cv::CLAHE> clahe = cv::createCLAHE();
+
   clahe->setClipLimit(4);
+
   clahe->apply(image1, image1);
+
   clahe->apply(image2, image2);
 
-  Mat PT = csva::filter_matches(kpts1, kpts2, matches, image1_process,
-                                image2_process, csva::geometry_mode::AEROSPACE,
-                                352, inliers, confide, 0.01);
+  cv::Mat PT = csva::filter_matches(
+      kpts1, kpts2, matches, image1_process, image2_process,
+      csva::geometry_mode::AEROSPACE, 352, inliers, confide, 0.01);
+
   printf("CSVA time = %f s\n", ((float)(clock()) - start) / CLOCKS_PER_SEC);
   start = clock();
-  Mat res = printMatches(kpts1, kpts2, inliers, image2_process, image2_process,
-                         cv::DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS |
-                             cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
 
-  std::set<char> delims{'\\', '/'};
-  std::vector<std::string> path = splitpath(argv[1], delims);
-  std::vector<std::string> path2 = splitpath(argv[2], delims);
-  string resultFolder = path.back() + "+" + path2.back();
-  // resultFolder += '_res2';
+  cv::Mat res =
+      printMatches(kpts1, kpts2, inliers, image2_process, image2_process,
+                   cv::DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS |
+                       cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
 
-  // string resultFolder = "result";
+  std::string resultFolder = std::string(argv[1]) + "_res";
 
-  makeDirectory(resultFolder);
-  imwrite(resultFolder + "/matches.png", res);
+  std::filesystem::create_directory(resultFolder);
 
-  std::string path_2save = resultFolder + "/06_res2.png";
-  cout << "path2save:" << path_2save << endl;
-  cv::imwrite(path_2save, res);
-  Mat result;
-  if (!PT.empty()) {
-    printf("saving images\n");
+  cv::imwrite(resultFolder + "/matches.jpg", res);
+
+  cv::Mat result;
+
+  if (!PT.empty())
+
+  {
+
     // we will aply transformation to the images of the original size
+
     PT = preT2.inv() * PT * preT1;
+
     cv::warpPerspective(image1, image1_proj, PT, image2.size());
+
     cv::warpPerspective(image1c, image1_projc, PT, image2.size());
 
-    vector<Mat> channels;
-    Mat g = Mat::zeros(image2.size(), CV_8UC1);
+    std::vector<cv::Mat> channels;
+
+    cv::Mat g = cv::Mat::zeros(image2.size(), CV_8UC1);
+
     channels.push_back(g);
+
     channels.push_back(image2);
+
     channels.push_back(image1_proj);
+
     merge(channels, outim);
-    cv::threshold(image1_proj, imageMask, 1, 255, CV_THRESH_BINARY);
+
+    cv::threshold(image1_proj, imageMask, 1, 255, cv::THRESH_BINARY);
+
     cv::subtract(image2, imageMask, xoredImage);
+
     cv::add(xoredImage, image1_proj, alignedImages);
-    vector<Mat> xoredLayers;
+
+    std::vector<cv::Mat> xoredLayers;
+
     xoredLayers.push_back(imageMask);
+
     xoredLayers.push_back(imageMask);
+
     xoredLayers.push_back(imageMask);
+
     merge(xoredLayers, imageMaskc);
+
     cv::subtract(image2c, imageMaskc, xoredImagec);
+
     cv::add(xoredImagec, image1_projc, alignedImagesc);
+
     alignedImagesc.copyTo(result);
 
     alignedImagesc.copyTo(result);
-    vector<int> compression_params;
+
+    //! imwrite(DebugInfoPath + "/kpts_m.jpg", res);
+
+    std::vector<int> compression_params;
+
 #if (CV_MAJOR_VERSION >= 4)
-    compression_params.push_back(cv::IMWRITE_JPEG_QUALITY);
-#else
-    compression_params.push_back(CV_IMWRITE_JPEG_QUALITY);
-#endif
-    compression_params.push_back(SAVE_JPG_QUALITY);
-    printf("outim %d\n", outim.size());
 
-    imwrite(resultFolder + "/05_reg_green.png", outim, compression_params);
-    imwrite(resultFolder + "/03_alignedc.png", alignedImagesc,
-            compression_params);
-    imwrite(resultFolder + "/01_obj.png", image1c, compression_params);
-    imwrite(resultFolder + "/02_scene.png", image2c, compression_params);
-    imwrite(resultFolder + "/04_transf_obj.png", image1_projc,
-            compression_params);
-    cout << "confidence: " << confide[0] << endl;
-  } else {
+    compression_params.push_back(cv::IMWRITE_JPEG_QUALITY);
+
+#else
+
+    compression_params.push_back(CV_IMWRITE_JPEG_QUALITY);
+
+#endif
+
+    compression_params.push_back(SAVE_JPG_QUALITY);
+
+    imwrite(resultFolder + "/reg_green.jpg", outim, compression_params);
+
+    imwrite(resultFolder + "/alignedc.jpg", alignedImagesc, compression_params);
+
+    imwrite(resultFolder + "/obj.jpg", image1c, compression_params);
+
+    imwrite(resultFolder + "/scene.jpg", image2c, compression_params);
+
+    imwrite(resultFolder + "/transf_obj.jpg", image1_projc, compression_params);
+
+    std::cout << "confidence: " << confide[0] << std::endl;
+
+  }
+
+  else
+
+  {
+
     printf("object is not detected!\n");
-    Mat m = mergeImages(image1, image2, 1);
+
+    cv::Mat m = mergeImages(image1, image2, 1);
+
     m.copyTo(result);
   }
 

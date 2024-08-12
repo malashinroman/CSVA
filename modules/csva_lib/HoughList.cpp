@@ -29,24 +29,27 @@ Permission is hereby granted, free of charge, to any person obtaining
  SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+
+#include <array>
+#include <functional>
+
 #include "HoughList.h"
 
+typedef std::array<int, 4> index4D;
 
 HoughListCpp::HoughListCpp()
 {
-	hash_table = std::unordered_map<index4D, vector<DMatch>, function<size_t(const index4D)> > { 100, hash4dd };
+    hash_table = std::unordered_map<index4D, std::vector<cv::DMatch>, std::function<size_t(const index4D)> > { 100, hash4dd };
 }
-#include <array>
-#include <functional>
-typedef std::array<int, 4> index4D;
 
-int HoughListCpp::AddMatch(DMatch match, int xbin, int ybin, int orbin, int scalebin)
+int HoughListCpp::AddMatch(cv::DMatch match, int xbin, int ybin, int orbin, int scalebin)
 {
-	index4D key = { xbin, ybin, orbin, scalebin };
-	hash_table[key].push_back(match);
-	return 1;
+    index4D key = { xbin, ybin, orbin, scalebin };
+    hash_table[key].push_back(match);
+    return 1;
 }
+
 size_t hash4dd(const index4D cell)
 {
-	return hash<int>()(cell[0] ^ hash<int>()(cell[1]) ^ hash<int>()(cell[2]) ^ hash<int>()(cell[3]));
+    return std::hash<int>()(cell[0] ^ std::hash<int>()(cell[1]) ^ std::hash<int>()(cell[2]) ^ std::hash<int>()(cell[3]));
 }

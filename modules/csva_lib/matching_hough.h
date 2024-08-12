@@ -35,12 +35,11 @@ Permission is hereby granted, free of charge, to any person obtaining
 #include "misc_functions.h"
 #include "Cluster_data.h"
 #include "HoughList.h"
-using namespace cv;
 
 class Hough_Transform
 {
 private:
-	vector<DMatch> UseTransfForCluster(Cluster_data& NewCData, double initPointPercTh, double initModelPercTh, 
+    std::vector<cv::DMatch> UseTransfForCluster(Cluster_data& NewCData, double initPointPercTh, double initModelPercTh,
 		double InitialRotationThresh, double InitialScaleThresh, 
 		TransformType transfType, 
 		double deleteClusterThresh = 0.2, int hip_check = 0, 
@@ -52,17 +51,17 @@ public:
 	void ExcludeOne2ManyFromClusters();
 	void ExcludeMany2OneFromClusters();
 	
-	Hough_Transform(double BinOrSize, double BinXSize, double BinYSize, double BinScFactor, Mat image1, Mat image2/*, HoughAccHashType hashtype = HashCpp11*/);
+    Hough_Transform(double BinOrSize, double BinXSize, double BinYSize, double BinScFactor, cv::Mat image1, cv::Mat image2/*, HoughAccHashType hashtype = HashCpp11*/);
 	~Hough_Transform();
-	void FillAcc(vector<KeyPoint> points1, vector<KeyPoint> points2, vector<DMatch> matches);
-	void FillAccNewBoundary(vector<KeyPoint> points1, vector<KeyPoint> points2, vector<DMatch> matches, int shift);
-	void FillAccNewBoundary2(vector<KeyPoint> points1, vector<KeyPoint> points2, vector<DMatch> matches, int shift);
+    void FillAcc(std::vector<cv::KeyPoint> points1, std::vector<cv::KeyPoint> points2, std::vector<cv::DMatch> matches);
+    void FillAccNewBoundary(std::vector<cv::KeyPoint> points1, std::vector<cv::KeyPoint> points2, std::vector<cv::DMatch> matches, int shift);
+    void FillAccNewBoundary2(std::vector<cv::KeyPoint> points1, std::vector<cv::KeyPoint> points2, std::vector<cv::DMatch> matches, int shift);
 	void FindClusters(int voteThresh);
 	Cluster_data MaxCluster();
 	
-	vector<DMatch> getAllClusterMatches();
-	vector<Cluster_data> clusters;
-	vector<DMatch> allmatches;
+    std::vector<cv::DMatch> getAllClusterMatches();
+    std::vector<Cluster_data> clusters;
+    std::vector<cv::DMatch> allmatches;
 
 	void sortClusters();
 
@@ -80,10 +79,10 @@ public:
 	int NumScaleBin;
 private:
 	int totalSizeofAcc;
-	Mat image1;
-	Mat image2;
-	vector<KeyPoint> keypoints1;
-	vector<KeyPoint> keypoints2;
+    cv::Mat image1;
+    cv::Mat image2;
+    std::vector<cv::KeyPoint> keypoints1;
+    std::vector<cv::KeyPoint> keypoints2;
 	int NumXBin;
 	int NumYBin;
 

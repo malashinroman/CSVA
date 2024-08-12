@@ -1,11 +1,9 @@
 #pragma once
 
-#include <opencv2/features2d.hpp>
-#include <stdio.h>
-#include <opencv2/core.hpp>
 #include "opencv2/features2d/features2d.hpp"
+#include <opencv2/core.hpp>
+#include <opencv2/features2d.hpp>
 #include <opencv2/xfeatures2d.hpp>
-
 
 #define SIMPLEBLOB_DETECTOR_TYPE 27
 #define GOODFEAT_DETECTOR_TYPE -1
@@ -33,12 +31,11 @@
 #define BRIEF_DESCRIPTOR_TYPE 40
 #define BRISK_DESCRIPTOR_TYPE 50
 #define ORB_DESCRIPTOR_TYPE 60
-#define FREAK_DESCRIPTOR_TYPE 3232//!
+#define FREAK_DESCRIPTOR_TYPE 3232 //!
 #define VGG_DESCRIPTOR_TYPE 70
-#define DAISY_DESCRIPTOR_TYPE 80 
+#define DAISY_DESCRIPTOR_TYPE 80
 
 #define LATCH_DESCRIPTOR_TYPE 90
-
 
 #define FLANN_MATCHER_TYPE 100
 #define BF_MATCHER_TYPE 200
@@ -47,61 +44,61 @@
 #define CROSSCHECK_MATCHER_TYPE 500
 #define BOW_MATCHING 600
 
-class OpenCVfeatures
-{
+class OpenCVfeatures {
 public:
-	bool globalInitializationDescriptors;
+  bool globalInitializationDescriptors;
+  cv::Ptr<cv::SiftFeatureDetector> detectorSift;
+  cv::Ptr<cv::xfeatures2d::SurfFeatureDetector> detectorSurf;
+  cv::Ptr<cv::FastFeatureDetector> detectorFast; // detectorFast(20)
+  cv::Ptr<cv::xfeatures2d::VGG> vggfeatures;
+  cv::Ptr<cv::MSER> detectorMser;
+  cv::Ptr<cv::xfeatures2d::StarDetector> detectorStar;
+  cv::Ptr<cv::SimpleBlobDetector> detectorSimpleBlob;
+  cv::Ptr<cv::AKAZE> detectorAkaze;
+  cv::Ptr<cv::AgastFeatureDetector> detectorAgast;
+  // Ptr<GoodFeaturesToTrackDetector> detectorGoodFeat;
+  cv::Ptr<cv::GFTTDetector> detectorGoodFeat;
+  cv::Ptr<cv::xfeatures2d::LATCH> detectorLatch;
+  cv::Ptr<cv::xfeatures2d::DAISY> detectorDaisy;
 
-	cv::Ptr<cv::SiftFeatureDetector> detectorSift;
-	// cv::Ptr<cv::xfeatures2d::SiftFeatureDetector> detectorSift;
-	cv::Ptr<cv::xfeatures2d::SurfFeatureDetector> detectorSurf;
-	cv::Ptr<cv::FastFeatureDetector> detectorFast; // detectorFast(20)
-	cv::Ptr<cv::xfeatures2d::VGG> vggfeatures;
-	cv::Ptr<cv::MSER> detectorMser;
-	cv::Ptr<cv::xfeatures2d::StarDetector> detectorStar;
-	cv::Ptr<cv::SimpleBlobDetector> detectorSimpleBlob;
-	cv::Ptr<cv::AKAZE> detectorAkaze;
-	cv::Ptr<cv::AgastFeatureDetector> detectorAgast;
-	//Ptr<GoodFeaturesToTrackDetector> detectorGoodFeat;
-	cv::Ptr<cv::GFTTDetector> detectorGoodFeat;
-	cv::Ptr<cv::xfeatures2d::LATCH> detectorLatch;
-	cv::Ptr<cv::xfeatures2d::DAISY> detectorDaisy;
+  // cv::xfeatures2d::
+  cv::Ptr<cv::ORB> detectorOrb;
+  // BRISK detectorBrisk(10, 4);
+  cv::Ptr<cv::BRISK> detectorBrisk;
 
-	//cv::xfeatures2d::
-	cv::Ptr<cv::ORB> detectorOrb;
-	//BRISK detectorBrisk(10, 4);
-	cv::Ptr<cv::BRISK> detectorBrisk;
-  cv::Ptr<cv::SiftFeatureDetector> extractorSift;
-
-	// cv::Ptr<cv::xfeatures2d::SiftDescriptorExtractor> extractorSift;
+  cv::Ptr<cv::SiftDescriptorExtractor> extractorSift;
 	cv::Ptr<cv::xfeatures2d::SurfDescriptorExtractor> extractorSurf;
-	//Ptr<OpponentColorDescriptorExtractor> extractorSURFOpponent(new SurfDescriptorExtractor);
 
-	cv::Ptr<cv::xfeatures2d::BriefDescriptorExtractor> extractorBrief;
-	cv::Ptr<cv::BRISK> extractorBrisk;
-	cv::Ptr<cv::ORB> extractorOrb;
-	cv::Ptr<cv::xfeatures2d::FREAK> extractorFreak;
-	cv::Ptr<cv::xfeatures2d::LATCH> extractorLatch;
-	cv::Ptr<cv::AKAZE> extractorAkaze;
-	cv::Ptr<cv::xfeatures2d::LUCID> extractorLucid;
-	cv::Ptr<cv::xfeatures2d::DAISY> extractorDaisy;
+  cv::Ptr<cv::xfeatures2d::BriefDescriptorExtractor> extractorBrief;
+  cv::Ptr<cv::BRISK> extractorBrisk;
+  cv::Ptr<cv::ORB> extractorOrb;
+  cv::Ptr<cv::xfeatures2d::FREAK> extractorFreak;
+  cv::Ptr<cv::xfeatures2d::LATCH> extractorLatch;
+  cv::Ptr<cv::AKAZE> extractorAkaze;
+  cv::Ptr<cv::xfeatures2d::LUCID> extractorLucid;
+  cv::Ptr<cv::xfeatures2d::DAISY> extractorDaisy;
 
-	//GfemFeatureDetectorExtractor detectorExtractorGfem;
-	cv::FlannBasedMatcher matcher1;
-	cv::BFMatcher matcher2;
+  // GfemFeatureDetectorExtractor detectorExtractorGfem;
+  cv::FlannBasedMatcher matcher1;
+  cv::BFMatcher matcher2;
 
-	cv::Ptr<cv::DescriptorMatcher> matcher3;
-	void initDetectorDescriptors();
+  cv::Ptr<cv::DescriptorMatcher> matcher3;
+  void initDetectorDescriptors();
 
-	void releaseDetectorDescriptors();
-	OpenCVfeatures();
-	~OpenCVfeatures();
-	std::vector<cv::DMatch> getLocalPatchMatches2(cv::Mat image1, cv::Mat image2,
-		std::vector<cv::KeyPoint>& points1, std::vector<cv::KeyPoint>& points2,
-		int type, int ConsoleOutput);
+  void releaseDetectorDescriptors();
+  OpenCVfeatures();
+  ~OpenCVfeatures();
+  std::vector<cv::DMatch> getLocalPatchMatches2(
+      cv::Mat image1, cv::Mat image2, std::vector<cv::KeyPoint> &points1,
+      std::vector<cv::KeyPoint> &points2, int type, int ConsoleOutput);
 
-	std::vector<cv::DMatch> getMatches(cv::Mat descs1, cv::Mat descs2, int type, int ConsoleOutput);
-	cv::Mat getDescriptors(cv::Mat image, std::vector<cv::KeyPoint>& points, int type, int ConsoleOutput);
-	std::vector<cv::KeyPoint> getKeyPoints(cv::Mat image, int type, int ConsoleOutput);
-	std::vector<cv::KeyPoint> refineNotUniqueKeypoints(std::vector<cv::KeyPoint> keypoints, cv::Mat image, int k, double nnr_thresh, int type);
+  std::vector<cv::DMatch> getMatches(cv::Mat descs1, cv::Mat descs2, int type,
+                                     int ConsoleOutput);
+  cv::Mat getDescriptors(cv::Mat image, std::vector<cv::KeyPoint> &points,
+                         int type, int ConsoleOutput);
+  std::vector<cv::KeyPoint> getKeyPoints(cv::Mat image, int type,
+                                         int ConsoleOutput);
+  std::vector<cv::KeyPoint>
+  refineNotUniqueKeypoints(std::vector<cv::KeyPoint> keypoints, cv::Mat image,
+                           int k, double nnr_thresh, int type);
 };
